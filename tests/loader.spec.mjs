@@ -66,7 +66,7 @@ test("reduced motion skips handwriting without blocking the homepage", async ({ 
   await expect(page.locator("#home-title")).toBeVisible();
 });
 
-test("editorial home keeps navigation, large x86 stamp, and no CRT terminal", async ({ page }) => {
+test("editorial home keeps navigation, large x86 stamp, and no CRT terminal", async ({ page }, testInfo) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto("/?lang=en", { waitUntil: "domcontentloaded" });
@@ -80,6 +80,7 @@ test("editorial home keeps navigation, large x86 stamp, and no CRT terminal", as
   await expect(page.locator(".workstation")).toBeVisible();
   await expect(page.locator("#binary-wave")).toHaveAttribute("data-wave-ready", "true");
   await expect(page.locator(".editorial-hero__link")).toHaveAttribute("href", "public/introduction/index.html");
+  await page.screenshot({ path: testInfo.outputPath("layout-home-desktop.png"), fullPage: true });
 });
 
 test("binary ocean uses a canvas, recolors with themes, and responds to resize", async ({ page }) => {
@@ -125,7 +126,7 @@ test("binary digits change only when motion is enabled", async ({ page }) => {
   await expect(wave).toHaveAttribute("data-wave-tick", frozen);
 });
 
-test("homepage navigation remains usable on narrow phones", async ({ page }) => {
+test("homepage navigation remains usable on narrow phones", async ({ page }, testInfo) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.setViewportSize({ width: 320, height: 700 });
   await page.goto("/", { waitUntil: "domcontentloaded" });
@@ -133,6 +134,7 @@ test("homepage navigation remains usable on narrow phones", async ({ page }) => 
   await expect(page.locator("#home-title")).toBeVisible();
   await expect(page.locator(".hero-stamp")).toBeVisible();
   await expect(page.locator(".site-menu")).toBeVisible();
+  await page.screenshot({ path: testInfo.outputPath("layout-home-mobile.png"), fullPage: true });
   await page.locator("#site-menu > summary").click();
   await page.locator(".site-menu__group > summary").first().click();
   await expect(page.locator('#site-menu nav[aria-label="Explore"] a')).toHaveCount(5);
