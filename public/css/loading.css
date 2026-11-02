@@ -484,3 +484,6 @@
   .loader__masthead { display: none; }
   .loader__left { justify-content: center; }
 }
+
+/* Loader colors track the selected site theme, including reduced motion. */
+.js .loader { --loading-paper: var(--paper); --loading-deep: var(--ink); --loading-teal: var(--teal); --loading-bright: var(--accent); }

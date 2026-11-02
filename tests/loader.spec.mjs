@@ -132,6 +132,8 @@ test("hamburger settings persist across pages", async ({ page }) => {
   const menu = page.locator("#site-menu");
   await menu.locator("summary").first().click();
   await expect(menu).toHaveAttribute("open", "");
+  await expect(menu.locator("summary").first()).toHaveAttribute("aria-label", "Toggle site menu");
+  await expect(menu.locator("summary").first()).not.toContainText("Menu");
   await menu.locator("#site-settings > summary").click();
   await menu.locator('input[name="theme"][value="hacked"]').check();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "hacked");
@@ -140,4 +142,109 @@ test("hamburger settings persist across pages", async ({ page }) => {
   await page.goto("/public/history/index.html");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "hacked");
   await expect(page.locator("html")).toHaveClass(/reduce-motion/);
+});
+
+test("theme labels and high contrast palette are applied", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/?lang=en");
+  const menu = page.locator("#site-menu");
+  await menu.locator("summary").first().click();
+  await menu.locator("#site-settings > summary").click();
+  await expect(menu.locator('input[name="theme"][value="light"]').locator("..")).toContainText("Default");
+  await expect(menu.locator('input[name="theme"][value="dark"]').locator("..")).toContainText("High Contrast");
+  await menu.locator('input[name="theme"][value="dark"]').check();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  const colors = await page.locator("html").evaluate((root) => {
+    const style = getComputedStyle(root);
+    return ["--paper", "--white", "--accent", "--ink", "--highlight", "--teal", "--secondary-accent"].map((name) => style.getPropertyValue(name).trim().toUpperCase());
+  });
+  expect(colors).toEqual(["#000000", "#1E1E2F", "#FF4500", "#F8F8FF", "#FFEA00", "#00CED1", "#8A2BE2"]);
+});
+
+test("reduced motion loader lasts at least one second (system preference and saved setting)", async ({ page }) => {
+  // Record DOM removal from an init script: navigation can finish after the
+  // loader has disappeared, especially when remote collage images finish late.
+  await page.addInitScript(() => {
+    window.__loaderObservedAt = performance.now();
+    window.__loaderRemovedAt = null;
+    const observer = new MutationObserver((records) => {
+      for (const record of records) {
+        for (const node of record.removedNodes) {
+          if (node.nodeType === 1 && (node.id === "loader" || node.querySelector?.("#loader"))) {
+            window.__loaderRemovedAt = performance.now();
+            observer.disconnect();
+            return;
+          }
+        }
+      }
+    });
+    observer.observe(document, { childList: true, subtree: true });
+  });
+  for (const saved of [false, true]) {
+    await page.emulateMedia({ reducedMotion: saved ? "no-preference" : "reduce" });
+    await page.goto("/?lang=en", { waitUntil: "domcontentloaded" });
+    if (saved) {
+      await page.evaluate(() => localStorage.setItem("x86-reduced-motion", "true"));
+      await page.reload({ waitUntil: "domcontentloaded" });
+    }
+    await expect.poll(() => page.evaluate(() => window.__loaderRemovedAt), { timeout: 6000 }).not.toBeNull();
+    const lifetime = await page.evaluate(() => window.__loaderRemovedAt - window.__loaderObservedAt);
+    expect(lifetime).toBeGreaterThanOrEqual(950);
+  }
+});
+
+test("themes survive reload, invalid saved values are ignored, and every page remains navigable", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  await page.evaluate(() => localStorage.setItem("x86-theme", "invalid!"));
+  await page.reload();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
+  for (const theme of ["dark", "navy", "hacked", "light"]) {
+    await page.locator("#site-menu > summary").click();
+    await page.locator("#site-settings > summary").click();
+    await page.locator('input[name="theme"][value="' + theme + '"]').check();
+    await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
+    await page.reload();
+    await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
+    await expect(page.locator("body")).toHaveCSS("background-color", theme === "light" ? "rgb(244, 244, 244)" : theme === "dark" ? "rgb(0, 0, 0)" : theme === "navy" ? "rgb(0, 28, 68)" : "rgb(3, 10, 4)");
+    await page.goto("/public/history/index.html");
+    await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
+    await page.goto("/");
+  }
+});
+
+test("hamburger supports mouse, Escape, outside click, keyboard and small screens", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.setViewportSize({ width: 320, height: 640 });
+  await page.goto("/");
+  const menu = page.locator("#site-menu");
+  const trigger = menu.locator(":scope > summary");
+  await trigger.focus();
+  await page.keyboard.press("Enter");
+  await expect(menu).toHaveAttribute("open", "");
+  await expect(trigger).toHaveAttribute("aria-expanded", "true");
+  await page.keyboard.press("Escape");
+  await expect(menu).not.toHaveAttribute("open", "");
+  await expect(trigger).toBeFocused();
+  await trigger.click();
+  await menu.locator("#site-settings > summary").click();
+  const panel = menu.locator(".site-menu__panel");
+  const bounds = await panel.boundingBox();
+  expect(bounds.x).toBeGreaterThanOrEqual(0);
+  expect(bounds.x + bounds.width).toBeLessThanOrEqual(321);
+  await page.locator(".site-logo").click();
+  await expect(menu).not.toHaveAttribute("open", "");
+});
+
+test("theme selection works when storage access is blocked", async ({ page }) => {
+  await page.addInitScript(() => {
+    Object.defineProperty(Storage.prototype, "getItem", { value() { throw new Error("blocked"); } });
+    Object.defineProperty(Storage.prototype, "setItem", { value() { throw new Error("blocked"); } });
+  });
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/");
+  await page.locator("#site-menu > summary").click();
+  await page.locator("#site-settings > summary").click();
+  await page.locator('input[name="theme"][value="dark"]').check();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
 });

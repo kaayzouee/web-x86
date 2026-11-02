@@ -336,7 +336,11 @@ main > ul a { display: block; padding: 22px 0; font-size: clamp(18px, 3vw, 25px)
 .site-menu input { accent-color: var(--teal); }
 .site-menu__motion { padding: 0 0 18px; }
 .site-menu :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
-html[data-theme="dark"] { color-scheme: dark; --ink: #e8f7f5; --teal: #75cfc8; --accent: #00b7b5; --paper: #101d21; --white: #172b30; --line: rgba(232,247,245,.2); }
+html[data-theme="dark"] { color-scheme: dark; --ink: #F8F8FF; --teal: #00CED1; --accent: #FF4500; --paper: #000000; --white: #1E1E2F; --line: rgba(248,248,255,.35); --highlight: #FFEA00; --secondary-accent: #8A2BE2; }
+html[data-theme="dark"] .site-menu__options legend, html[data-theme="dark"] .site-footer__label { color: var(--highlight); }
+html[data-theme="dark"] .site-menu__group > summary::after { color: var(--secondary-accent); }
+html[data-theme="dark"] a:hover { color: var(--highlight); }
+html[data-theme="dark"] .site-menu :focus-visible { outline-color: var(--highlight); }
 html[data-theme="navy"] { color-scheme: dark; --ink: #fff; --teal: #b9d7ff; --accent: #69b6ff; --paper: #001c44; --white: #092b5e; --line: rgba(255,255,255,.42); }
 html[data-theme="hacked"] { color-scheme: dark; --ink: #80ff91; --teal: #52e96e; --accent: #b4ffbd; --paper: #030a04; --white: #081309; --line: rgba(128,255,145,.32); }
 html[data-theme]:not([data-theme="light"]) .site-header { background: var(--paper); }
@@ -348,3 +352,11 @@ html[data-theme="hacked"]:not(.reduce-motion) body::after { animation: crt-drift
 @keyframes crt-drift { to { background-position-y: 12px; } }
 html.reduce-motion,html.reduce-motion * { scroll-behavior: auto !important; animation: none !important; transition: none !important; }
 @media (prefers-reduced-motion: reduce) { html[data-theme="hacked"] body::after { animation: none !important; } }
+
+/* Theme-specific surfaces must not retain colors from the default palette. */
+html[data-theme]:not([data-theme="light"]) .loader { background-color: var(--paper); color: var(--ink); }
+html[data-theme]:not([data-theme="light"]) .site-header { background: var(--paper); }
+html[data-theme]:not([data-theme="light"]) .crt-terminal__screen { border-color: var(--line); }
+html[data-theme]:not([data-theme="light"]) .site-footer__bottom { border-color: var(--line); }
+.site-menu > summary { min-width: 44px; min-height: 44px; justify-content: center; }
+.site-menu__panel { overscroll-behavior: contain; }

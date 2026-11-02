@@ -84,11 +84,10 @@
     ["introduction", "Overview"], ["history", "History"],
     ["architecture", "Architecture"], ["instructions", "Instructions"], ["comparison", "Comparison"]
   ];
-  const oldNav = header.querySelector(".site-nav");
-  const base = oldNav?.querySelector("a")?.getAttribute("href")?.split("public/")[0] ?? "../../";
+  const base = new URL(document.querySelector(".site-logo")?.getAttribute("href") || "index.html", location.href).href.replace(/index\.html(?:\?.*)?$/, "");
   const makeLink = (section, label) => {
     const a = document.createElement("a");
-    a.href = base + "public/" + section + "/index.html";
+    a.href = new URL("public/" + section + "/index.html", base).href;
     a.textContent = label;
     return a;
   };
@@ -96,8 +95,8 @@
   menu.className = "site-menu";
   menu.id = "site-menu";
   const summary = document.createElement("summary");
-  summary.setAttribute("aria-label", "Open site menu");
-  summary.innerHTML = '<span class="menu-icon" aria-hidden="true"><i></i><i></i><i></i></span><span>Menu</span>';
+  summary.setAttribute("aria-label", "Toggle site menu");
+  summary.innerHTML = '<span class="menu-icon" aria-hidden="true"><i></i><i></i><i></i></span>';
   const panel = document.createElement("div");
   panel.className = "site-menu__panel";
   const group = (title) => {
@@ -144,7 +143,7 @@
     settings.append(field);
   };
   options(language === "vi" ? "Giao diện" : "Theme", "theme",
-    [["light", "Light"], ["dark", "Dark"], ["navy", "Navy"], ["hacked", "Hacked!"]], theme);
+    [["light", "Default"], ["dark", "High Contrast"], ["navy", "Navy"], ["hacked", "Hacked!"]], theme);
   options(language === "vi" ? "Ngôn ngữ" : "Language", "language",
     [["en", "EN"], ["vi", "VI"]], language);
   const motionLabel = document.createElement("label");
@@ -158,10 +157,12 @@
   menu.append(summary, panel);
   header.append(menu);
   root.classList.add("has-site-menu");
+  summary.setAttribute("aria-expanded", "false");
+  menu.addEventListener("toggle", () => summary.setAttribute("aria-expanded", String(menu.open)));
 
   menu.addEventListener("change", (event) => {
     const input = event.target;
-    if (input.name === "theme") {
+    if (input.name === "theme" && themes.includes(input.value)) {
       root.dataset.theme = input.value;
       save("x86-theme", input.value);
     } else if (input.name === "language") {
@@ -184,16 +185,6 @@
       summary.focus();
     }
   });
-  if (matchMedia("(hover: hover) and (pointer: fine)").matches) {
-    let closeTimer;
-    menu.addEventListener("mouseenter", () => {
-      clearTimeout(closeTimer);
-      menu.open = true;
-    });
-    menu.addEventListener("mouseleave", () => {
-      closeTimer = setTimeout(() => { menu.open = false; }, 250);
-    });
-  }
   for (const item of panel.querySelectorAll(".site-menu__group")) {
     item.addEventListener("toggle", () => {
       if (item.open) panel.querySelectorAll(".site-menu__group").forEach((other) => {
