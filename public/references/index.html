@@ -4,26 +4,65 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>References — x86</title>
-  <link rel="stylesheet" href="/public/css/main.css">
-  <script src="/public/js/main.js" defer></script>
+  <link rel="stylesheet" href="../../public/css/main.css">
+  <script src="../../public/js/main.js" defer></script>
 </head>
 <body>
-  <header>
-    <nav aria-label="Main navigation">
-      <a href="/index.html">Home</a>
-      <a href="/public/introduction/index.html">Introduction</a>
-      <a href="/public/history/index.html">History</a>
-      <a href="/public/architecture/index.html">Architecture</a>
-      <a href="/public/instructions/index.html">Instructions</a>
-      <a href="/public/comparison/index.html">Comparison</a>
-    </nav>
+  <header class="site-header">
+    <div class="site-header__inner">
+      <a class="site-logo" href="../../index.html" aria-label="x86 homepage">x86<span class="site-logo__dot">.</span></a>
+      <nav class="site-nav" aria-label="Primary">
+        <a href="../../public/introduction/index.html">Overview</a>
+        <a href="../../public/history/index.html">History</a>
+        <a href="../../public/architecture/index.html">Architecture</a>
+        <a href="../../public/instructions/index.html">Instructions</a>
+        <a href="../../public/comparison/index.html">Comparison</a>
+      </nav>
+      <details class="mobile-nav">
+        <summary aria-label="Open navigation">Menu <span aria-hidden="true">+</span></summary>
+        <nav aria-label="Mobile">
+          <a href="../../public/introduction/index.html">Overview</a>
+          <a href="../../public/history/index.html">History</a>
+          <a href="../../public/architecture/index.html">Architecture</a>
+          <a href="../../public/instructions/index.html">Instructions</a>
+          <a href="../../public/comparison/index.html">Comparison</a>
+        </nav>
+      </details>
+    </div>
   </header>
   <main>
     <h1>References</h1>
   </main>
-  <footer>
-    <a href="/public/references/index.html">References</a>
-    <a href="/public/license/index.html">License</a>
+  <footer class="site-footer">
+    <div class="site-footer__inner">
+      <div class="site-footer__top">
+        <div>
+          <p class="site-footer__eyebrow">A field guide to computing</p>
+          <p class="site-footer__message">A closer look at x86.</p>
+        </div>
+        <div class="site-footer__links">
+          <div>
+            <p class="site-footer__label">Explore</p>
+            <a href="../../public/introduction/index.html">Introduction</a>
+            <a href="../../public/history/index.html">History</a>
+            <a href="../../public/architecture/index.html">Architecture</a>
+            <a href="../../public/instructions/index.html">Instructions</a>
+            <a href="../../public/comparison/index.html">Comparison</a>
+          </div>
+          <div>
+            <p class="site-footer__label">Information</p>
+            <a href="../../public/references/index.html">References</a>
+            <a href="../../public/license/index.html">License</a>
+            <a href="https://github.com/kaayzouee/web-x86">GitHub</a>
+          </div>
+        </div>
+      </div>
+      <p class="site-footer__wordmark" aria-hidden="true">x86<span>.</span></p>
+      <div class="site-footer__bottom">
+        <span>© x86</span>
+        <span>Learn the fundamentals.</span>
+      </div>
+    </div>
   </footer>
 </body>
 </html>
