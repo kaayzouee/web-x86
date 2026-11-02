@@ -258,7 +258,7 @@ html.home-page .home-main {
   right: -21px;
   bottom: -15px;
   width: 21px;
-  background: var(--home-shadow);
+  background: var(--home-wave);
   clip-path: polygon(0 16px, 100% 0, 100% calc(100% - 16px), 0 100%);
 }
 .workstation__screen {
