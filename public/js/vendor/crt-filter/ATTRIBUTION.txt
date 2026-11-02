@@ -1,0 +1,4 @@
+crt-filter (code4fukui)
+https://github.com/code4fukui/crt-filter
+Shader based on PICO-8 CRT framework by ultrabrite and CRT shader by Mattias Gustavsson.
+Upstream README identifies the project as MIT licensed.

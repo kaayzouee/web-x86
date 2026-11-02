@@ -84,3 +84,18 @@ test("hero description switches to assembly code and back", async ({ page }) => 
   await expect(toggle).toHaveAttribute("aria-pressed", "false");
   await expect(toggle.locator(".hero-toggle__code")).toHaveAttribute("aria-hidden", "true");
 });
+
+test("CRT terminal is visible and its filter can be toggled", async ({ page }) => {
+  await page.goto("/?lang=en", { waitUntil: "domcontentloaded" });
+  await expect(page.locator("#crt-source")).toBeVisible();
+  await expect(page.locator(".crt-terminal")).toBeVisible();
+  const toggle = page.locator("#crt-toggle");
+  await expect(toggle).toBeVisible();
+  await expect.poll(async () => toggle.getAttribute("aria-pressed")).toBe("true");
+  await expect(page.locator("#crtcanvas")).toBeVisible();
+  await toggle.click();
+  await expect(toggle).toHaveAttribute("aria-pressed", "false");
+  await expect(page.locator("#crtcanvas")).toHaveCSS("opacity", "0");
+  await toggle.click();
+  await expect(toggle).toHaveAttribute("aria-pressed", "true");
+});
