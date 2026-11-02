@@ -352,3 +352,11 @@ html[data-theme="hacked"]:not(.reduce-motion) body::after { animation: crt-drift
 @keyframes crt-drift { to { background-position-y: 12px; } }
 html.reduce-motion,html.reduce-motion * { scroll-behavior: auto !important; animation: none !important; transition: none !important; }
 @media (prefers-reduced-motion: reduce) { html[data-theme="hacked"] body::after { animation: none !important; } }
+
+/* Theme-specific surfaces must not retain colors from the default palette. */
+html[data-theme]:not([data-theme="light"]) .loader { background-color: var(--paper); color: var(--ink); }
+html[data-theme]:not([data-theme="light"]) .site-header { background: var(--paper); }
+html[data-theme]:not([data-theme="light"]) .crt-terminal__screen { border-color: var(--line); }
+html[data-theme]:not([data-theme="light"]) .site-footer__bottom { border-color: var(--line); }
+.site-menu > summary { min-width: 44px; min-height: 44px; justify-content: center; }
+.site-menu__panel { overscroll-behavior: contain; }
