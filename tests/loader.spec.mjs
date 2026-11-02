@@ -99,3 +99,23 @@ test("CRT terminal is visible and its filter can be toggled", async ({ page }) =
   await toggle.click();
   await expect(toggle).toHaveAttribute("aria-pressed", "true");
 });
+
+test("editorial loader keeps hello and progress left of vintage computer collage", async ({ page }) => {
+  await page.goto("/?lang=vi", { waitUntil: "domcontentloaded" });
+  const loader = page.locator("#loader");
+  const left = loader.locator(".loader__left");
+  const art = loader.locator(".loader__art");
+  const photos = art.locator(".loader__photo img");
+  await expect(photos).toHaveCount(3);
+  await expect(loader.locator(".loader__hello[data-language=vi]")).toBeVisible();
+  await expect(loader.locator("#loader-progress")).toBeVisible();
+  const leftRect = await left.boundingBox();
+  const artRect = await art.boundingBox();
+  expect(leftRect.x + leftRect.width).toBeLessThanOrEqual(artRect.x + 2);
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  const stackedLeft = await left.boundingBox();
+  const stackedArt = await art.boundingBox();
+  expect(stackedArt.y).toBeGreaterThan(stackedLeft.y);
+  await expect(loader.locator("#loader-progress")).toBeVisible();
+});

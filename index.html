@@ -7,15 +7,22 @@
   <title>x86 — Home</title>
   <script>document.documentElement.classList.add("js");</script>
   <link rel="stylesheet" href="public/css/main.css?v=3">
-  <link rel="stylesheet" href="public/css/loading.css?v=2">
+  <link rel="stylesheet" href="public/css/loading.css?v=3">
   <script src="public/js/loading.js?v=6" defer></script>
   <script src="public/js/main.js?v=2" defer></script>
   <script type="module" src="public/js/crt-terminal.js"></script>
 </head>
 <body>
   <div class="loader" id="loader" role="status" aria-label="Loading x86">
-    <div class="loader__center">
-      <div class="loader__wordmark" aria-hidden="true">
+    <div class="loader__layout">
+      <section class="loader__left">
+        <div class="loader__masthead">
+          <span>Experimental computing.<br>Inside the machine.<br><strong>x86, first edition.</strong></span>
+          <span class="loader__folio">NO. 01 / 86</span>
+        </div>
+        <div class="loader__center">
+          <p class="loader__eyebrow">A SMALL HELLO FROM X86 <span aria-hidden="true">✳</span></p>
+          <div class="loader__wordmark" aria-hidden="true">
         <svg class="loader__hello" data-language="en" data-duration="3500" hidden viewBox="0 0 638 200" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="hello">
           <title>hello</title>
           <g stroke="currentColor" stroke-width="14.8883" stroke-linecap="round" stroke-linejoin="round">
@@ -39,14 +46,44 @@
           </g>
         </svg>
         <span class="loader__meet">meet <strong>x86</strong><span class="loader__period">.</span></span>
-      </div>
-
-      <div class="loader__progress" id="loader-progress" role="progressbar" aria-label="Page loading progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+          </div>
+          <p class="loader__caption">An architecture field guide, from the first instruction onward.</p>
+          <div class="loader__progress" id="loader-progress" role="progressbar" aria-label="Page loading progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
         <div class="loader__track"><span class="loader__fill" id="loader-fill"></span></div>
         <div class="loader__meta">
           <span class="loader__percent" id="loader-percent">0%</span>
         </div>
         <span class="loader__detail" id="loader-detail" aria-live="polite">loading html</span>
+          </div>
+        </div>
+        <div class="loader__left-footer" aria-hidden="true">
+          <span class="loader__barcode"></span>
+          <span>FIELD NOTES / 1981 — TODAY</span>
+        </div>
+      </section>
+      <div class="loader__art" aria-hidden="true">
+        <div class="loader__orbit"></div>
+        <svg class="loader__swirl" viewBox="0 0 780 850" fill="none" preserveAspectRatio="none">
+          <path d="M-35 620 C110 570 55 390 250 368 S565 358 550 140 S690 90 790 -55" />
+          <path d="M100 -65 C240 90 330 70 470 192" />
+        </svg>
+        <span class="loader__art-label">PERSONAL COMPUTING<br>1981 / 1982 / 1984</span>
+        <figure class="loader__photo loader__photo--ibm">
+          <img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/3/32/IBM_5150_PC.JPG/500px-IBM_5150_PC.JPG" alt="" loading="lazy" decoding="async" fetchpriority="high">
+          <figcaption>IBM PC 5150 &nbsp; / &nbsp; 1981</figcaption>
+        </figure>
+        <figure class="loader__photo loader__photo--mac">
+          <img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/f/f5/Apple-Macintosh.jpg/500px-Apple-Macintosh.jpg" alt="" loading="lazy" decoding="async" fetchpriority="high">
+          <figcaption>MACINTOSH PLUS &nbsp; / &nbsp; 1986</figcaption>
+        </figure>
+        <figure class="loader__photo loader__photo--c64">
+          <img src="https://thumb.wikimedia.org/wikipedia/commons/thumb/e/e9/Commodore-64-Computer-FL.jpg/960px-Commodore-64-Computer-FL.jpg" alt="" loading="lazy" decoding="async" fetchpriority="high">
+          <figcaption>COMMODORE 64 &nbsp; / &nbsp; 1982</figcaption>
+        </figure>
+        <svg class="loader__spark loader__spark--a" viewBox="0 0 70 94" fill="none"><path d="M35 1 C37 30 41 42 69 47 C41 50 37 64 35 93 C31 64 27 51 1 47 C27 42 31 28 35 1Z"/></svg>
+        <svg class="loader__spark loader__spark--b" viewBox="0 0 70 94" fill="none"><path d="M35 1 C37 30 41 42 69 47 C41 50 37 64 35 93 C31 64 27 51 1 47 C27 42 31 28 35 1Z"/></svg>
+        <span class="loader__dot"></span>
+        <span class="loader__art-index">86</span>
       </div>
     </div>
   </div>
