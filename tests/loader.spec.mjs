@@ -66,38 +66,81 @@ test("reduced motion skips handwriting without blocking the homepage", async ({ 
   await expect(page.locator("#home-title")).toBeVisible();
 });
 
-test("hero description switches to assembly code and back", async ({ page }) => {
+test("editorial home keeps navigation, large x86 stamp, and no CRT terminal", async ({ page }, testInfo) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.goto("/?lang=en");
+  await page.setViewportSize({ width: 1280, height: 900 });
+  await page.goto("/?lang=en", { waitUntil: "domcontentloaded" });
   await expect(page.locator("#loader")).toHaveCount(0, { timeout: 5000 });
-
-  const toggle = page.locator("#hero-toggle");
-  await expect(toggle).toContainText("Explore the fundamentals");
-  await expect(toggle).toHaveAttribute("aria-pressed", "false");
-
-  await toggle.click();
-  await expect(toggle).toHaveAttribute("aria-pressed", "true");
-  await expect(toggle.locator(".hero-toggle__code")).toBeVisible();
-  await expect(toggle.locator(".hero-toggle__code")).toContainText("syscall");
-
-  await toggle.click();
-  await expect(toggle).toHaveAttribute("aria-pressed", "false");
-  await expect(toggle.locator(".hero-toggle__code")).toHaveAttribute("aria-hidden", "true");
+  await expect(page.locator(".hero-stamp")).toContainText("86");
+  await expect(page.locator("#home-title")).toHaveText("Inside x86.");
+  await expect(page.locator(".site-nav")).toBeVisible();
+  await expect(page.locator(".site-nav a")).toHaveCount(5);
+  await expect(page.locator("#site-menu > summary")).toBeVisible();
+  await expect(page.locator(".crt-terminal, #crt-toggle, #crt-source")).toHaveCount(0);
+  await expect(page.locator(".workstation")).toBeVisible();
+  await expect(page.locator("#binary-wave")).toHaveAttribute("data-wave-ready", "true");
+  await expect(page.locator(".editorial-hero__link")).toHaveAttribute("href", "public/introduction/index.html");
+  await page.screenshot({ path: testInfo.outputPath("layout-home-desktop.png"), fullPage: true });
 });
 
-test("CRT terminal is visible and its filter can be toggled", async ({ page }) => {
-  await page.goto("/?lang=en", { waitUntil: "domcontentloaded" });
-  await expect(page.locator("#crt-source")).toBeVisible();
-  await expect(page.locator(".crt-terminal")).toBeVisible();
-  const toggle = page.locator("#crt-toggle");
-  await expect(toggle).toBeVisible();
-  await expect.poll(async () => toggle.getAttribute("aria-pressed")).toBe("true");
-  await expect(page.locator("#crtcanvas")).toBeVisible();
-  await toggle.click();
-  await expect(toggle).toHaveAttribute("aria-pressed", "false");
-  await expect(page.locator("#crtcanvas")).toHaveCSS("opacity", "0");
-  await toggle.click();
-  await expect(toggle).toHaveAttribute("aria-pressed", "true");
+test("binary ocean uses a canvas, recolors with themes, and responds to resize", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+  const wave = page.locator("#binary-wave");
+  await expect(wave).toHaveAttribute("data-wave-ready", "true");
+  await expect(wave).toHaveAttribute("data-wave-color", "#2869fa");
+  const sampled = await wave.evaluate((canvas) => {
+    const { data } = canvas.getContext("2d").getImageData(0, 0, canvas.width, canvas.height);
+    let colored = 0;
+    for (let index = 0; index < data.length; index += 128) {
+      if (data[index] !== 255 || data[index + 1] !== 255 || data[index + 2] !== 255) colored++;
+    }
+    return colored;
+  });
+  expect(sampled).toBeGreaterThan(0);
+  await page.locator("#site-menu > summary").click();
+  await page.locator("#site-settings > summary").click();
+  await page.locator('input[name="theme"][value="dark"]').check();
+  await expect(wave).toHaveAttribute("data-wave-color", "#ff4500");
+  await expect(wave).toHaveAttribute("data-wave-reduced", "true");
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect.poll(() => wave.evaluate((canvas) => {
+    return Math.abs(canvas.getBoundingClientRect().width - 390) < 2;
+  })).toBe(true);
+  await expect.poll(() => page.evaluate(() =>
+    document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1
+  )).toBe(true);
+});
+
+test("binary digits change only when motion is enabled", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+  const wave = page.locator("#binary-wave");
+  await expect(wave).toHaveAttribute("data-wave-ready", "true");
+  await expect.poll(async () => Number(await wave.getAttribute("data-wave-tick")),
+    { timeout: 5000 }).toBeGreaterThan(0);
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await expect(wave).toHaveAttribute("data-wave-reduced", "true");
+  const frozen = await wave.getAttribute("data-wave-tick");
+  await page.waitForTimeout(1500);
+  await expect(wave).toHaveAttribute("data-wave-tick", frozen);
+});
+
+test("homepage navigation remains usable on narrow phones", async ({ page }, testInfo) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.setViewportSize({ width: 320, height: 700 });
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+  await expect(page.locator("#loader")).toHaveCount(0, { timeout: 5000 });
+  await expect(page.locator("#home-title")).toBeVisible();
+  await expect(page.locator(".hero-stamp")).toBeVisible();
+  await expect(page.locator(".site-menu")).toBeVisible();
+  await page.screenshot({ path: testInfo.outputPath("layout-home-mobile.png"), fullPage: true });
+  await page.locator("#site-menu > summary").click();
+  await page.locator(".site-menu__group > summary").first().click();
+  await expect(page.locator('#site-menu nav[aria-label="Explore"] a')).toHaveCount(5);
+  await expect.poll(() => page.evaluate(() =>
+    document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1
+  )).toBe(true);
 });
 
 test("editorial loader keeps hello and progress left of vintage computer collage", async ({ page }, testInfo) => {
@@ -206,7 +249,7 @@ test("themes survive reload, invalid saved values are ignored, and every page re
     await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
     await page.reload();
     await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
-    await expect(page.locator("body")).toHaveCSS("background-color", theme === "light" ? "rgb(244, 244, 244)" : theme === "dark" ? "rgb(0, 0, 0)" : theme === "navy" ? "rgb(0, 28, 68)" : "rgb(3, 10, 4)");
+    await expect(page.locator("body")).toHaveCSS("background-color", theme === "light" ? "rgb(255, 255, 255)" : theme === "dark" ? "rgb(0, 0, 0)" : theme === "navy" ? "rgb(0, 28, 68)" : "rgb(3, 10, 4)");
     await page.goto("/public/history/index.html");
     await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
     await page.goto("/");

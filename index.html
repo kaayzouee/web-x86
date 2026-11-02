@@ -1,17 +1,18 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="home-page">
 <head>
   <meta charset="utf-8">
     <script>(() => { try { const theme = localStorage.getItem("x86-theme"); if (["light", "dark", "navy", "hacked"].includes(theme)) document.documentElement.dataset.theme = theme; if (localStorage.getItem("x86-reduced-motion") === "true") document.documentElement.classList.add("reduce-motion"); } catch {} })();</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#f4f4f4">
-  <title>x86 — Home</title>
+  <meta name="theme-color" content="#ffffff">
+  <title>x86 — Inside the architecture</title>
   <script>document.documentElement.classList.add("js");</script>
-  <link rel="stylesheet" href="public/css/main.css?v=4">
+  <link rel="stylesheet" href="public/css/main.css?v=5">
   <link rel="stylesheet" href="public/css/loading.css?v=4">
+  <link rel="stylesheet" href="public/css/home.css?v=1">
   <script src="public/js/loading.js?v=7" defer></script>
   <script src="public/js/main.js?v=4" defer></script>
-  <script type="module" src="public/js/crt-terminal.js"></script>
+  <script src="public/js/home-wave.js?v=1" defer></script>
 </head>
 <body>
   <div class="loader" id="loader" role="status" aria-label="Loading x86">
@@ -112,52 +113,78 @@
     </div>
   </header>
   <main class="home-main">
-    <section class="home-hero" aria-labelledby="home-title">
-      <p class="eyebrow assembly-line"><code id="assembly-command">mov eax, 1</code><span class="assembly-cursor" aria-hidden="true"></span></p>
-      <h1 id="home-title">Inside x86<span>.</span></h1>
-      <button class="hero-toggle" id="hero-toggle" type="button" aria-pressed="false" aria-label="Show assembly code">
-        <span class="hero-toggle__text">Explore the fundamentals of the architecture behind modern computing.</span>
-        <span class="hero-toggle__code" aria-hidden="true"><code><span>mov rax, 1</span><span>mov rdi, 1</span><span>lea rsi, [rel msg]</span><span>mov rdx, msg_len</span><span>syscall</span></code></span>
-      </button>
-      <a class="text-link" href="public/introduction/index.html">Start exploring <span aria-hidden="true">↗</span></a>
+    <section class="editorial-hero" aria-labelledby="home-title">
+      <div class="editorial-hero__grid">
+        <div class="hero-stamp" aria-label="X86">
+          <span aria-hidden="true">X<br>86</span>
+        </div>
+        <div class="hero-editorial">
+          <div class="hero-editorial__topline">
+            <span class="hero-editorial__edition">X86<br>FIELD<br>GUIDE</span>
+            <div class="hero-palette" aria-hidden="true">
+              <i></i><i></i><i></i>
+            </div>
+          </div>
+          <div class="hero-editorial__copy">
+            <div class="hero-editorial__heading">
+              <h2>Digital.<br>Origins.</h2>
+              <svg class="hero-expand" viewBox="0 0 96 96" aria-hidden="true">
+                <path d="M10 10H36M10 10V36M10 10L86 86M60 86H86V60M86 10H60M86 10V36M86 10L10 86M10 60V86H36" />
+              </svg>
+            </div>
+            <p>From the first 8086 to the processors of today. Explore the instruction set, its evolution, and the architecture inside modern computing.</p>
+          </div>
+        </div>
+      </div>
+      <h1 id="home-title" class="editorial-hero__wordmark">Inside x86<span>.</span></h1>
+      <div class="editorial-hero__captions">
+        <span>The Origins</span>
+        <span>Of Modern</span>
+        <span>Computing</span>
+      </div>
+      <a class="editorial-hero__link" href="public/introduction/index.html">Explore the field guide <span aria-hidden="true">↗</span></a>
     </section>
-    <aside class="crt-terminal" aria-label="CRT assembly display">
-      <div class="crt-terminal__top"><span>LIVE TERMINAL</span><button id="crt-toggle" type="button" aria-pressed="true">CRT ON</button></div>
-      <div class="crt-terminal__screen">
-        <canvas id="crt-source" width="512" height="320" role="img" aria-label="Animated assembly code on a CRT screen">Assembly terminal</canvas>
+
+    <section class="binary-scene" aria-labelledby="binary-scene-title">
+      <div class="binary-scene__label">
+        <h2 id="binary-scene-title">The binary tide</h2>
+        <span>8086 / 80286 / 80386 / NOW</span>
       </div>
-      <div class="crt-terminal__bottom"><span>x86 / 64-BIT</span><span>MONITOR 01</span></div>
-    </aside>
+      <canvas id="binary-wave" class="binary-scene__canvas" role="img"
+        aria-label="A cyber ocean wave drawn with changing zeros and ones. The distant digits are small and faint; the foreground digits are larger and more vivid."></canvas>
+      <div class="workstation" aria-hidden="true">
+        <div class="workstation__monitor">
+          <div class="workstation__screen">
+            <span class="workstation__screen-mark">x86</span>
+            <span class="workstation__screen-digits">0101 1010 0011<br>1100 0101 1010</span>
+          </div>
+          <div class="workstation__chin"><span></span><span></span></div>
+        </div>
+        <div class="workstation__neck"></div>
+        <div class="workstation__foot"></div>
+        <div class="workstation__tower">
+          <span class="workstation__drive"></span>
+          <span class="workstation__drive workstation__drive--short"></span>
+          <span class="workstation__power"></span>
+        </div>
+        <div class="workstation__desk"></div>
+        <div class="workstation__keyboard"></div>
+        <div class="workstation__leg workstation__leg--left"></div>
+        <div class="workstation__leg workstation__leg--right"></div>
+      </div>
+      <p class="binary-scene__note">A study in zeroes, ones, and everything they make possible.</p>
+    </section>
   </main>
-  <footer class="site-footer">
-    <div class="site-footer__inner">
-      <div class="site-footer__top">
-        <div>
-          <p class="site-footer__eyebrow">A field guide to computing</p>
-          <p class="site-footer__message">A closer look at x86.</p>
-        </div>
-        <div class="site-footer__links">
-          <div>
-            <p class="site-footer__label">Explore</p>
-            <a href="public/introduction/index.html">Introduction</a>
-            <a href="public/history/index.html">History</a>
-            <a href="public/architecture/index.html">Architecture</a>
-            <a href="public/instructions/index.html">Instructions</a>
-            <a href="public/comparison/index.html">Comparison</a>
-          </div>
-          <div>
-            <p class="site-footer__label">Information</p>
-            <a href="public/references/index.html">References</a>
-            <a href="public/license/index.html">License</a>
-            <a href="https://github.com/kaayzouee/web-x86">GitHub</a>
-          </div>
-        </div>
-      </div>
-      <p class="site-footer__wordmark" aria-hidden="true">x86<span>.</span></p>
-      <div class="site-footer__bottom">
-        <span>© x86</span>
-        <span>Learn the fundamentals.</span>
-      </div>
+  <footer class="site-footer home-footer">
+    <div class="home-footer__inner">
+      <span>x86 / An architecture field guide</span>
+      <nav aria-label="Footer navigation">
+        <a href="public/introduction/index.html">Start reading</a>
+        <a href="public/history/index.html">History</a>
+        <a href="public/architecture/index.html">Architecture</a>
+        <a href="public/references/index.html">References</a>
+      </nav>
+      <span>© x86</span>
     </div>
   </footer>
 </body>
