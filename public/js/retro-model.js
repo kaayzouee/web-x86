@@ -9,7 +9,21 @@
     fallback.textContent = "3D preview unavailable.";
   };
 
-  import("https://ajax.googleapis.com/ajax/libs/model-viewer/4.4.0/model-viewer.min.js").catch(fail);
+  const loadViewer = () => import(
+    "https://ajax.googleapis.com/ajax/libs/model-viewer/4.4.0/model-viewer.min.js"
+  ).catch(fail);
+
+  if (document.getElementById("loader")) {
+    const observer = new MutationObserver(() => {
+      if (!document.getElementById("loader")) {
+        observer.disconnect();
+        loadViewer();
+      }
+    });
+    observer.observe(document.body, { childList: true });
+  } else {
+    loadViewer();
+  }
 
   viewer.addEventListener("load", () => {
     wrapper.dataset.state = "ready";
