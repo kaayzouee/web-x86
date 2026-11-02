@@ -46,3 +46,19 @@
   element.textContent = "";
   animate();
 })();
+
+(() => {
+  const toggle = document.getElementById("hero-toggle");
+  if (!toggle) return;
+
+  toggle.querySelectorAll(".hero-toggle__code code span").forEach((line, index) => {
+    line.style.setProperty("--line", index);
+  });
+
+  toggle.addEventListener("click", () => {
+    const active = toggle.classList.toggle("is-code");
+    toggle.setAttribute("aria-pressed", String(active));
+    toggle.setAttribute("aria-label", active ? "Show description" : "Show assembly code");
+    toggle.querySelector(".hero-toggle__code").setAttribute("aria-hidden", String(!active));
+  });
+})();

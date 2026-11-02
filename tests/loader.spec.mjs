@@ -65,3 +65,22 @@ test("reduced motion skips handwriting without blocking the homepage", async ({ 
   await expect(page.locator("#loader")).toHaveCount(0, { timeout: 5000 });
   await expect(page.locator("#home-title")).toBeVisible();
 });
+
+test("hero description switches to assembly code and back", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/?lang=en");
+  await expect(page.locator("#loader")).toHaveCount(0, { timeout: 5000 });
+
+  const toggle = page.locator("#hero-toggle");
+  await expect(toggle).toContainText("Explore the fundamentals");
+  await expect(toggle).toHaveAttribute("aria-pressed", "false");
+
+  await toggle.click();
+  await expect(toggle).toHaveAttribute("aria-pressed", "true");
+  await expect(toggle.locator(".hero-toggle__code")).toBeVisible();
+  await expect(toggle.locator(".hero-toggle__code")).toContainText("syscall");
+
+  await toggle.click();
+  await expect(toggle).toHaveAttribute("aria-pressed", "false");
+  await expect(toggle.locator(".hero-toggle__code")).toHaveAttribute("aria-hidden", "true");
+});

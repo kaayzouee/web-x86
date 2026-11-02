@@ -168,3 +168,79 @@ main > ul a { display: block; padding: 22px 0; font-size: clamp(18px, 3vw, 25px)
 @media (prefers-reduced-motion: reduce) {
   .assembly-cursor { animation: none; }
 }
+
+.hero-toggle {
+  display: grid;
+  width: min(100%, 570px);
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.hero-toggle:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 8px;
+}
+
+.hero-toggle__text,
+.hero-toggle__code {
+  grid-area: 1 / 1;
+  transition: opacity 280ms ease, transform 280ms ease;
+}
+
+.hero-toggle__text {
+  font-size: clamp(18px, 2.5vw, 26px);
+  line-height: 1.45;
+}
+
+.hero-toggle__code {
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+}
+
+.hero-toggle__code code {
+  display: block;
+  color: var(--teal);
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  font-size: clamp(13px, 1.8vw, 17px);
+  line-height: 1.55;
+}
+
+.hero-toggle__code code span {
+  display: block;
+  opacity: 0;
+  transform: translateY(5px);
+  transition: opacity 260ms ease, transform 260ms ease;
+  transition-delay: 0ms;
+}
+
+.hero-toggle.is-code .hero-toggle__text {
+  opacity: 0;
+  transform: translateY(-8px);
+  pointer-events: none;
+}
+
+.hero-toggle.is-code .hero-toggle__code {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.hero-toggle.is-code .hero-toggle__code code span {
+  opacity: 1;
+  transform: translateY(0);
+  transition-delay: calc(var(--line) * 100ms + 180ms);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-toggle__text,
+  .hero-toggle__code,
+  .hero-toggle__code code span {
+    transition: none;
+  }
+}
