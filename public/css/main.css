@@ -137,3 +137,34 @@ main > ul a { display: block; padding: 22px 0; font-size: clamp(18px, 3vw, 25px)
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
 }
+
+.assembly-line {
+  display: flex;
+  align-items: center;
+  min-height: 1.5em;
+  gap: 3px;
+  color: var(--teal);
+}
+
+.assembly-line code {
+  font-family: ui-monospace, SFMono-Regular, Consolas, "Liberation Mono", monospace;
+  font-size: 13px;
+  letter-spacing: .035em;
+  text-transform: none;
+}
+
+.assembly-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: var(--accent);
+  animation: assembly-blink 1s steps(1) infinite;
+}
+
+@keyframes assembly-blink {
+  50% { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .assembly-cursor { animation: none; }
+}
