@@ -100,7 +100,8 @@ test("CRT terminal is visible and its filter can be toggled", async ({ page }) =
   await expect(toggle).toHaveAttribute("aria-pressed", "true");
 });
 
-test("editorial loader keeps hello and progress left of vintage computer collage", async ({ page }) => {
+test("editorial loader keeps hello and progress left of vintage computer collage", async ({ page }, testInfo) => {
+  await page.setViewportSize({ width: 1200, height: 675 });
   await page.goto("/?lang=vi", { waitUntil: "domcontentloaded" });
   const loader = page.locator("#loader");
   const left = loader.locator(".loader__left");
@@ -112,10 +113,15 @@ test("editorial loader keeps hello and progress left of vintage computer collage
   const leftRect = await left.boundingBox();
   const artRect = await art.boundingBox();
   expect(leftRect.x + leftRect.width).toBeLessThanOrEqual(artRect.x + 2);
+  await expect.poll(() => photos.evaluateAll((images) =>
+    images.every((image) => image.complete && image.naturalWidth > 0)
+  ), { timeout: 5000 }).toBe(true);
+  await page.screenshot({ path: testInfo.outputPath("layout-desktop.png") });
 
   await page.setViewportSize({ width: 390, height: 844 });
   const stackedLeft = await left.boundingBox();
   const stackedArt = await art.boundingBox();
   expect(stackedArt.y).toBeGreaterThan(stackedLeft.y);
   await expect(loader.locator("#loader-progress")).toBeVisible();
+  await page.screenshot({ path: testInfo.outputPath("layout-mobile.png") });
 });
