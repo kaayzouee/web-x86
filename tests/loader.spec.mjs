@@ -318,6 +318,6 @@ test("3D model failure offers a readable fallback", async ({ page }) => {
   await expect(page.locator("#retro-model")).toHaveAttribute("data-state", "error");
   await expect(page.locator(".retro-model__fallback")).toContainText("unavailable");
   await expect(page.locator(".binary-scene__credit")).toHaveAttribute(
-    "href", /sketchfab\\.com/
+    "href", "https://sketchfab.com/3d-models/retro-computer-3a496376915846459d77fc14fdd6c1e0"
   );
 });
