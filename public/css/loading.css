@@ -443,7 +443,14 @@
 
 @media (max-width: 760px) {
   .loader__layout { grid-template-columns: 1fr; grid-template-rows: 55% 45%; }
-  .loader__left { padding: 25px 28px 8px; }
+  .loader__left {
+    padding: 25px 28px 8px;
+    background-color: var(--loading-paper);
+    background-image:
+      linear-gradient(rgba(0, 84, 97, .082) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0, 84, 97, .082) 1px, transparent 1px);
+    background-size: 56px 56px;
+  }
   .loader__masthead { font-size: 10px; }
   .loader__folio { display: none; }
   .loader__center { width: min(100%, 500px); transform: none; }
