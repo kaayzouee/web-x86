@@ -55,6 +55,23 @@ test("painted homepage has no cropped headings or illustration/footer collisions
     const footer = await rect(page.locator(".home-footer"));
     const label = await rect(page.locator(".binary-scene__label"));
 
+    const logo = await rect(page.locator(".hero-stamp__logo"));
+    expect(logo.x).toBeGreaterThanOrEqual(square.x - 1);
+    expect(logo.x + logo.width).toBeLessThanOrEqual(square.x + square.width + 1);
+    expect(logo.y + logo.height).toBeLessThanOrEqual(square.y + square.height + 1);
+    await expect(page.locator(".hero-stamp__logo")).toHaveText("X86");
+
+    const screen = await rect(page.locator(".workstation__screen"));
+    const mark = await rect(page.locator(".workstation__screen-mark"));
+    expect(mark.width).toBeLessThan(screen.width * .8);
+    expect(mark.y + mark.height).toBeLessThan(screen.y + screen.height * .85);
+    const faces = await page.locator(".workstation__monitor").evaluate((element) => ({
+      top: getComputedStyle(element, "::before").clipPath,
+      side: getComputedStyle(element, "::after").clipPath
+    }));
+    expect(faces.top).not.toBe("none");
+    expect(faces.side).not.toBe("none");
+
     expect(Math.abs(square.width - square.height)).toBeLessThan(2);
     expect(square.y).toBeGreaterThanOrEqual(header.y + header.height - 5);
     expect(title.y).toBeGreaterThanOrEqual(square.y + square.height - 3);
@@ -75,6 +92,22 @@ test("painted homepage has no cropped headings or illustration/footer collisions
       return foreground;
     });
     expect(drawn).toBeGreaterThan(30);
+
+    const centerSurf = await canvas.evaluate(element => {
+      const context = element.getContext("2d");
+      const background = context.getImageData(0, 0, 1, 1).data;
+      let pixels = 0;
+      for (let y = Math.round(element.height * .24); y < element.height * .42; y += 3) {
+        for (let x = Math.round(element.width * .4); x < element.width * .6; x += 3) {
+          const sample = context.getImageData(x, y, 1, 1).data;
+          if (Math.abs(sample[0] - background[0]) +
+              Math.abs(sample[1] - background[1]) +
+              Math.abs(sample[2] - background[2]) > 4) pixels++;
+        }
+      }
+      return pixels;
+    });
+    expect(centerSurf).toBeGreaterThan(10);
 
     measurements.push({ viewport: viewport.label, width: viewport.width, height: viewport.height, header, square, title, scene, station, footer, sceneLabel: label, drawn });
     await page.screenshot({

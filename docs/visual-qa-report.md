@@ -34,3 +34,13 @@ The captured visual audit reported **zero** browser page errors, console errors,
 - The original picture is an editorial illustration and a photograph-like pixel-art scene. A glyph-only binary ocean and CSS workstation cannot reproduce the exact texture or train-station details; visual fidelity is about **layout, scale, negative space and tonal depth**, not a pixel-perfect copy.
 - Named third-party visual agents listed in the task summary were not installed here; this audit used real Playwright screenshots, browser DOM/runtime measurements, and manual inspection of the downloaded images.
 - Subsequent changes should capture new screenshots and inspect them, not merely depend on CI returning green. If the page loses its recognizable shore silhouette, shows clipped type, or overlaps the navigation/footer, iterate before release.
+
+## Workstation and binary-depth correction — 2026-11-02
+
+- Kept the JS-style X86 badge on one line at the lower-right corner.
+- Reworked the monitor and tower top/side faces and reduced the screen wordmark.
+- Added a faint, full-width binary layer behind the workstation, preserving stronger foreground digits.
+- Reviewed actual screenshots at 320×700, 390×844, 736×920, 1280×900 and 1440×900, plus Default, High Contrast, Navy and Hacked themes.
+- Browser audit: no console errors, page errors, request failures, or HTTP errors.
+- Regression checks: badge/text bounds, visible workstation depth, readable screen contents and center binary coverage.
+- GitHub Actions: https://github.com/kaayzouee/web-x86/actions/runs/41471541673 — passed.
