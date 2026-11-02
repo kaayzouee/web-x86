@@ -18,7 +18,9 @@
       return null;
     }
   })();
-  const language = (preference || navigator.language || document.documentElement.lang || "en").toLowerCase().startsWith("vi") ? "vi" : "en";
+  const requested = new URLSearchParams(location.search).get("lang");
+  const configured = (requested === "en" || requested === "vi") ? requested : preference;
+  const language = (configured || document.documentElement.lang || navigator.language || "en").toLowerCase().startsWith("vi") ? "vi" : "en";
   const selected = language === "vi" ? vietnamese : english;
   for (const greeting of [english, vietnamese]) {
     greeting.hidden = greeting !== selected;
