@@ -55,13 +55,13 @@
     const step = width < 500 ? 10 : 12;
     for (let y = height * .18, row = 0; y < height * .7; y += step, row++) {
       for (let x = 0, col = 0; x < width; x += step, col++) {
-        const start = height * (.19 + .045 * Math.sin(x * .012));
+        const start = height * (.12 + .035 * Math.sin(x * .012));
         if (y < start) continue;
         const depth = (y - start) / (height * .5);
         const chance = hash(row, col, 19);
-        if (chance > .23 + depth * .45) continue;
-        drawDigit(x, y, 5 + depth * 5, chance > .7 ? foam : haze,
-          .22 + depth * .26, row + 800, col, 20);
+        if (chance > .55 + depth * .35) continue;
+        drawDigit(x, y, 5 + depth * 5, chance > .35 ? foam : haze,
+          .44 + depth * .26, row + 800, col, 20);
       }
     }
   };
