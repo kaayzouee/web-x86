@@ -15,7 +15,7 @@
   const watchdog = setTimeout(() => {
     loader.classList.add("is-leaving");
     loader.remove();
-  }, 16000);
+  }, 20000);
 
   const update = (next, status) => {
     if (closed) return;
@@ -50,7 +50,10 @@
       return;
     }
 
-    const duration = Number(svg.dataset.duration) || 3500;
+    const duration = Math.max(...Array.from(strokes, (stroke) => {
+      const style = getComputedStyle(stroke);
+      return parseFloat(style.getPropertyValue("--delay")) + parseFloat(style.getPropertyValue("--duration"));
+    }));
     const started = performance.now();
     update(from, status);
 
