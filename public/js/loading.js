@@ -8,10 +8,16 @@
   if (!loader || !bar || !fill || !percent || !detail) return;
 
   const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
-  const started = performance.now();
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   let value = 0;
   let finished = false;
+  const lastStroke = loader.querySelector(".loader__hello path:last-child");
+  const writingDone = reducedMotion || !lastStroke
+    ? Promise.resolve()
+    : Promise.race([
+        new Promise((resolve) => lastStroke.addEventListener("animationend", resolve, { once: true })),
+        delay(3100)
+      ]);
 
   const update = (next, status) => {
     value = Math.max(value, next);
@@ -25,7 +31,7 @@
     if (finished) return;
     finished = true;
     update(100, "ready");
-    await delay(reducedMotion ? 0 : Math.max(0, 1850 - (performance.now() - started)));
+    await writingDone;
     loader.classList.add("is-ready");
     await delay(reducedMotion ? 0 : 800);
     loader.classList.add("is-leaving");

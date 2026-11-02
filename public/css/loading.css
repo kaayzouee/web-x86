@@ -54,13 +54,13 @@
 .loader__hello path {
   stroke-dasharray: 100;
   stroke-dashoffset: 100;
-  animation: loader-write 950ms cubic-bezier(.28,.05,.3,1) forwards;
+  animation: loader-write 520ms cubic-bezier(.28,.05,.3,1) forwards;
 }
 
-.loader__hello path:nth-child(2) { animation-delay: 270ms; }
-.loader__hello path:nth-child(3) { animation-delay: 490ms; }
-.loader__hello path:nth-child(4) { animation-delay: 670ms; }
-.loader__hello path:nth-child(5) { animation-delay: 830ms; }
+.loader__hello path:nth-child(2) { animation-delay: 520ms; }
+.loader__hello path:nth-child(3) { animation-delay: 1040ms; }
+.loader__hello path:nth-child(4) { animation-delay: 1560ms; }
+.loader__hello path:nth-child(5) { animation-delay: 2080ms; }
 
 .loader__meet {
   position: absolute;
@@ -118,7 +118,7 @@
 
 .loader__meta {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   margin-top: 11px;
   color: var(--loading-teal);
   font-size: 10px;
@@ -126,9 +126,6 @@
   letter-spacing: .13em;
 }
 
-.loader__hint {
-  opacity: .55;
-}
 
 .loader__percent {
   font-variant-numeric: tabular-nums;
