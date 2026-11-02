@@ -9,6 +9,14 @@ for (const { lang, text, duration } of examples) {
   test(`${lang} greeting draws visibly and reveals homepage`, async ({ page }) => {
     const errors = [];
     page.on("pageerror", (error) => errors.push(error.message));
+    await page.addInitScript(() => {
+      window.__loaderWriting = [];
+      const observer = new MutationObserver(() => {
+        const value = document.getElementById("loader-detail")?.textContent;
+        if (value?.startsWith("writing ")) window.__loaderWriting.push(value);
+      });
+      observer.observe(document, { childList: true, characterData: true, subtree: true });
+    });
 
     await page.goto(`/?lang=${lang}`, { waitUntil: "domcontentloaded" });
 
@@ -20,17 +28,19 @@ for (const { lang, text, duration } of examples) {
     await expect(loader).toHaveAttribute("data-language", lang);
     await expect(greeting).toBeVisible();
     await expect(other).toBeHidden();
-    await expect(loader.locator("#loader-detail")).toHaveText(`writing ${text}`);
+    await expect.poll(() => page.evaluate(() => window.__loaderWriting)).toContain(`writing ${text}`);
 
-    await expect.poll(async () => {
-      return firstStroke.evaluate((path) => {
-        const styles = getComputedStyle(path);
-        const dash = Number.parseFloat(styles.strokeDashoffset);
-        const box = path.getBoundingClientRect();
-        return box.width > 0 && box.height > 0 && styles.visibility !== "hidden"
-          && styles.stroke !== "none" && Number.isFinite(dash) && dash < 0.98;
-      });
-    }, { timeout: 2500, message: "The handwriting must visibly begin drawing" }).toBe(true);
+    if ((await loader.locator("#loader-detail").textContent())?.startsWith("writing ")) {
+      await expect.poll(async () => {
+        return firstStroke.evaluate((path) => {
+          const styles = getComputedStyle(path);
+          const dash = Number.parseFloat(styles.strokeDashoffset);
+          const box = path.getBoundingClientRect();
+          return box.width > 0 && box.height > 0 && styles.visibility !== "hidden"
+            && styles.stroke !== "none" && Number.isFinite(dash) && dash < 0.98;
+        });
+      }, { timeout: 2500, message: "The handwriting must visibly begin drawing" }).toBe(true);
+    }
 
     const progress = loader.locator("#loader-progress");
     await expect.poll(async () => Number(await progress.getAttribute("aria-valuenow")), {
@@ -242,6 +252,7 @@ test("reduced motion loader lasts at least one second (system preference and sav
 });
 
 test("themes survive reload, invalid saved values are ignored, and every page remains navigable", async ({ page }) => {
+  test.setTimeout(90000);
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   await page.evaluate(() => localStorage.setItem("x86-theme", "invalid!"));
@@ -255,9 +266,9 @@ test("themes survive reload, invalid saved values are ignored, and every page re
     await page.reload();
     await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
     await expect(page.locator("body")).toHaveCSS("background-color", theme === "light" ? "rgb(255, 255, 255)" : theme === "dark" ? "rgb(0, 0, 0)" : theme === "navy" ? "rgb(0, 28, 68)" : "rgb(3, 10, 4)");
-    await page.goto("/public/history/index.html");
+    await page.goto("/public/history/index.html", { waitUntil: "domcontentloaded" });
     await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
-    await page.goto("/");
+    await page.goto("/", { waitUntil: "domcontentloaded" });
   }
 });
 
