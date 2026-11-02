@@ -76,7 +76,7 @@ test("painted homepage has no cropped headings or illustration/footer collisions
     });
     expect(drawn).toBeGreaterThan(30);
 
-    measurements.push({ ...viewport, header, square, title, scene, station, footer, label, drawn });
+    measurements.push({ viewport: viewport.label, width: viewport.width, height: viewport.height, header, square, title, scene, station, footer, sceneLabel: label, drawn });
     await page.screenshot({
       path: testInfo.outputPath("layout-qa-" + viewport.label + ".png"),
       fullPage: true,
@@ -86,6 +86,7 @@ test("painted homepage has no cropped headings or illustration/footer collisions
   writeFileSync(testInfo.outputPath("visual-audit.json"),
     JSON.stringify({ measurements, runtime }, null, 2));
   expect(runtime.pageErrors).toEqual([]);
+  expect(runtime.consoleErrors.filter(message => !message.includes("wikimedia.org"))).toEqual([]);
   const sameOriginFailures = runtime.requestFailures.filter(item =>
     item.url.startsWith("http://127.0.0.1:4173/"));
   expect(sameOriginFailures).toEqual([]);
