@@ -89,10 +89,10 @@
       update(10, "loading assets");
       await draw(english, 15, 45, "writing hello");
       if (!reducedMotion) {
-        await delay(550);
+        await delay(250);
         english.hidden = true;
         await draw(vietnamese, 50, 95, "writing xin chào");
-        await delay(550);
+        await delay(250);
       }
       await ready;
     } finally {
