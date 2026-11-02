@@ -83,6 +83,7 @@ html.home-page .home-main {
   place-items: center;
   width: min(100%, 430px);
   aspect-ratio: 1;
+  align-self: start;
   background: var(--home-blue);
   color: var(--home-bg);
   overflow: hidden;
@@ -149,7 +150,7 @@ html.home-page .home-main {
 }
 .editorial-hero__wordmark {
   margin: clamp(16px, 2vw, 34px) 0 10px;
-  font-size: clamp(66px, 12.25vw, 198px);
+  font-size: clamp(80px, 14.7vw, 212px);
   font-weight: 800;
   line-height: .9;
   letter-spacing: -.09em;
@@ -362,7 +363,7 @@ html.home-page .home-footer {
   .hero-editorial__heading h2 { font-size: clamp(27px, 5vw, 45px); }
   .hero-expand { width: clamp(27px, 5.5vw, 48px); stroke-width: 7; }
   .hero-editorial__copy p { font-size: clamp(10px, 1.9vw, 13px); line-height: 1.22; margin-top: 10px; }
-  .editorial-hero__wordmark { font-size: clamp(56px, 12.2vw, 86px); margin-top: 17px; }
+  .editorial-hero__wordmark { font-size: clamp(63px, 13.9vw, 100px); margin-top: 17px; }
   .editorial-hero__captions { font-size: clamp(10px, 2vw, 14px); gap: 9px; }
   .editorial-hero__link { margin-top: 20px; }
   .binary-scene { height: 480px; margin-top: 56px; }
@@ -378,7 +379,7 @@ html.home-page .home-footer {
   .hero-stamp { font-size: 65px; }
   .hero-editorial__heading h2 { font-size: 25px; }
   .hero-editorial__copy p { font-size: 10px; }
-  .editorial-hero__wordmark { font-size: 12vw; }
+  .editorial-hero__wordmark { font-size: 52px; }
   .binary-scene__label span { display: none; }
   .workstation { width: 86vw; }
 }
