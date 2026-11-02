@@ -177,8 +177,9 @@ test("reduced motion loader lasts at least one second (system preference and sav
 
 test("themes survive reload, invalid saved values are ignored, and every page remains navigable", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
-  await page.addInitScript(() => localStorage.setItem("x86-theme", "invalid!"));
   await page.goto("/");
+  await page.evaluate(() => localStorage.setItem("x86-theme", "invalid!"));
+  await page.reload();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "light");
   for (const theme of ["dark", "navy", "hacked", "light"]) {
     await page.locator("#site-menu > summary").click();
