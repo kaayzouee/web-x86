@@ -84,11 +84,10 @@
     ["introduction", "Overview"], ["history", "History"],
     ["architecture", "Architecture"], ["instructions", "Instructions"], ["comparison", "Comparison"]
   ];
-  const oldNav = header.querySelector(".site-nav");
-  const base = oldNav?.querySelector("a")?.getAttribute("href")?.split("public/")[0] ?? "../../";
+  const base = new URL(document.querySelector(".site-logo")?.getAttribute("href") || "index.html", location.href).href.replace(/index\.html(?:\?.*)?$/, "");
   const makeLink = (section, label) => {
     const a = document.createElement("a");
-    a.href = base + "public/" + section + "/index.html";
+    a.href = new URL("public/" + section + "/index.html", base).href;
     a.textContent = label;
     return a;
   };
@@ -158,10 +157,12 @@
   menu.append(summary, panel);
   header.append(menu);
   root.classList.add("has-site-menu");
+  summary.setAttribute("aria-expanded", "false");
+  menu.addEventListener("toggle", () => summary.setAttribute("aria-expanded", String(menu.open)));
 
   menu.addEventListener("change", (event) => {
     const input = event.target;
-    if (input.name === "theme") {
+    if (input.name === "theme" && themes.includes(input.value)) {
       root.dataset.theme = input.value;
       save("x86-theme", input.value);
     } else if (input.name === "language") {
