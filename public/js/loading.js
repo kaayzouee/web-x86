@@ -42,7 +42,10 @@
   };
 
   const draw = async (svg, from, to, status) => {
-    svg.hidden = false;
+    for (const greeting of [english, vietnamese]) {
+      greeting.hidden = greeting !== svg;
+    }
+    detail.textContent = status;
     const strokes = svg.querySelectorAll("path");
     if (reducedMotion) {
       strokes.forEach((stroke) => { stroke.style.strokeDashoffset = "0"; });
@@ -59,19 +62,32 @@
 
     await new Promise((resolve) => {
       const last = strokes[strokes.length - 1];
-      last.addEventListener("animationend", resolve, { once: true });
+      let settled = false;
+      let tick;
+      let fallback;
+
+      const finish = () => {
+        if (settled) return;
+        settled = true;
+        clearInterval(tick);
+        clearTimeout(fallback);
+        last.removeEventListener("animationend", onEnd);
+        resolve();
+      };
+      const onEnd = (event) => {
+        if (event.target === last) finish();
+      };
+
+      last.addEventListener("animationend", onEnd);
       svg.classList.add("is-writing");
 
-      const tick = setInterval(() => {
-        if (closed) return clearInterval(tick);
+      tick = setInterval(() => {
+        if (closed) return finish();
         const fraction = Math.min(1, (performance.now() - started) / duration);
         update(from + (to - from) * fraction, status);
       }, 80);
 
-      setTimeout(() => {
-        clearInterval(tick);
-        resolve();
-      }, duration + 500);
+      fallback = setTimeout(finish, duration + 500);
     });
 
     update(to, status);
@@ -93,7 +109,6 @@
       await draw(english, 15, 45, "writing hello");
       if (!reducedMotion) {
         await delay(250);
-        english.hidden = true;
         await draw(vietnamese, 50, 95, "writing xin chào");
         await delay(250);
       }
