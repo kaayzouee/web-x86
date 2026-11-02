@@ -3,11 +3,41 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f4f4">
   <title>x86 — Home</title>
+  <script>document.documentElement.classList.add("js");</script>
   <link rel="stylesheet" href="public/css/main.css">
+  <link rel="stylesheet" href="public/css/loading.css">
+  <script src="public/js/loading.js" defer></script>
   <script src="public/js/main.js" defer></script>
 </head>
 <body>
+  <div class="loader" id="loader" role="status" aria-label="Loading x86">
+    <div class="loader__center">
+      <div class="loader__wordmark" aria-hidden="true">
+        <svg class="loader__hello" viewBox="0 0 440 176" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <g stroke="currentColor" stroke-width="7" stroke-linecap="round" stroke-linejoin="round">
+            <path pathLength="100" d="M61 130 C70 98 79 53 88 27 C92 15 102 16 100 32 C96 61 79 112 80 131 C89 106 106 91 117 97 C131 105 113 131 125 134 C137 137 148 127 156 118"/>
+            <path pathLength="100" d="M156 118 C175 122 194 108 197 97 C200 86 187 85 176 96 C164 108 161 135 179 137 C193 139 204 126 213 116"/>
+            <path pathLength="100" d="M213 116 C231 89 243 51 244 29 C245 14 233 17 228 34 C217 70 208 111 213 129 C217 142 232 130 241 116"/>
+            <path pathLength="100" d="M241 116 C260 88 273 50 275 29 C276 15 264 17 259 36 C249 70 239 112 245 130 C251 142 266 130 274 118"/>
+            <path pathLength="100" d="M307 101 C294 89 277 103 275 121 C272 140 291 144 307 129 C319 118 326 100 319 94 C315 91 309 97 311 105 C313 118 329 125 342 118"/>
+          </g>
+        </svg>
+        <span class="loader__meet">meet <strong>x86</strong><span class="loader__period">.</span></span>
+      </div>
+
+      <div class="loader__progress" id="loader-progress" role="progressbar" aria-label="Page loading progress" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" tabindex="0">
+        <div class="loader__track"><span class="loader__fill" id="loader-fill"></span></div>
+        <div class="loader__meta">
+          <span class="loader__hint">HOVER FOR DETAILS</span>
+          <span class="loader__percent" id="loader-percent">0%</span>
+        </div>
+        <span class="loader__detail" id="loader-detail" aria-live="polite">loading html</span>
+      </div>
+    </div>
+  </div>
+
   <header>
     <nav aria-label="Main navigation">
       <a href="index.html">x86</a>
