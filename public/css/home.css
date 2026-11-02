@@ -244,12 +244,13 @@ html.home-page .home-main {
 }
 .retro-model[data-state="ready"] .retro-model__fallback { display: none; }
 .binary-scene__credit {
-  position: absolute;
-  right: 20px;
-  bottom: 10px;
-  z-index: 3;
+  display: block;
+  max-width: 1430px;
+  margin: 0 auto;
+  padding: 8px clamp(24px, 5.8vw, 82px) 14px;
   font-size: 11px;
   color: var(--home-muted);
+  text-align: right;
 }
 .binary-scene__credit:hover { color: var(--home-blue); }
 
