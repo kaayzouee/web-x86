@@ -9,10 +9,12 @@
   <script>document.documentElement.classList.add("js");</script>
   <link rel="stylesheet" href="public/css/main.css?v=5">
   <link rel="stylesheet" href="public/css/loading.css?v=4">
-  <link rel="stylesheet" href="public/css/home.css?v=2">
+  <link rel="stylesheet" href="public/css/home.css?v=3">
   <script src="public/js/loading.js?v=7" defer></script>
   <script src="public/js/main.js?v=4" defer></script>
   <script src="public/js/home-wave.js?v=2" defer></script>
+  <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.4.0/model-viewer.min.js"></script>
+  <script src="public/js/retro-model.js?v=1" defer></script>
 </head>
 <body>
   <div class="loader" id="loader" role="status" aria-label="Loading x86">
@@ -152,26 +154,16 @@
       </div>
       <canvas id="binary-wave" class="binary-scene__canvas" role="img"
         aria-label="A cyber ocean wave drawn with changing zeros and ones. The distant digits are small and faint; the foreground digits are larger and more vivid."></canvas>
-      <div class="workstation" aria-hidden="true">
-        <div class="workstation__monitor">
-          <div class="workstation__screen">
-            <span class="workstation__screen-mark">x86</span>
-            <span class="workstation__screen-digits">0101 1010 0011<br>1100 0101 1010</span>
-          </div>
-          <div class="workstation__chin"><span></span><span></span></div>
-        </div>
-        <div class="workstation__neck"></div>
-        <div class="workstation__foot"></div>
-        <div class="workstation__tower">
-          <span class="workstation__drive"></span>
-          <span class="workstation__drive workstation__drive--short"></span>
-          <span class="workstation__power"></span>
-        </div>
-        <div class="workstation__desk"></div>
-        <div class="workstation__keyboard"></div>
-        <div class="workstation__leg workstation__leg--left"></div>
-        <div class="workstation__leg workstation__leg--right"></div>
+      <div class="retro-model" id="retro-model">
+        <model-viewer id="retro-computer"
+          alt="A low-poly retro computer with monitor, tower, keyboard, and mouse"
+          camera-controls disable-zoom interaction-prompt="none"
+          camera-orbit="30deg 70deg 110%" shadow-intensity="0.7"
+          loading="lazy" touch-action="pan-y"></model-viewer>
+        <p class="retro-model__fallback" role="status">Loading 3D workstation…</p>
       </div>
+      <a class="binary-scene__credit" href="https://sketchfab.com/3d-models/retro-computer-3a496376915846459d77fc14fdd6c1e0"
+        target="_blank" rel="noopener noreferrer">Computer model by Tobalation · CC BY</a>
     </section>
   </main>
   <footer class="site-footer home-footer">
