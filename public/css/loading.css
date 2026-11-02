@@ -29,7 +29,7 @@
 }
 
 .loader__center {
-  width: min(100%, 450px);
+  width: min(100%, 560px);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -45,8 +45,9 @@
 }
 
 .loader__hello {
-  width: min(100%, 440px);
-  height: 100%;
+  width: auto;
+  max-width: 100%;
+  height: clamp(62px, 16vw, 108px);
   color: var(--loading-deep);
   overflow: visible;
 }
