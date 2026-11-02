@@ -8,6 +8,8 @@ on:
 jobs:
   browser:
     runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.56.1-noble
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
@@ -16,8 +18,6 @@ jobs:
           node-version: '22'
       - name: Install Playwright
         run: npm install --no-save @playwright/test@1.56.1
-      - name: Install Chromium
-        run: npx playwright install --with-deps chromium
       - name: Test loading screen
         run: npx playwright test
       - name: Save screenshots and traces on failure
