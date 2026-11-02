@@ -9,6 +9,20 @@
   const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const english = loader.querySelector('.loader__hello[data-language="en"]');
   const vietnamese = loader.querySelector('.loader__hello[data-language="vi"]');
+  const preference = (() => {
+    try {
+      return localStorage.getItem("x86-language")
+        || localStorage.getItem("language")
+        || localStorage.getItem("lang");
+    } catch {
+      return null;
+    }
+  })();
+  const language = (preference || navigator.language || document.documentElement.lang || "en").toLowerCase().startsWith("vi") ? "vi" : "en";
+  const selected = language === "vi" ? vietnamese : english;
+  for (const greeting of [english, vietnamese]) {
+    greeting.hidden = greeting !== selected;
+  }
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   let progress = 0;
   let closed = false;
@@ -105,13 +119,9 @@
 
   const run = async () => {
     try {
-      update(10, "loading assets");
-      await draw(english, 15, 45, "writing hello");
-      if (!reducedMotion) {
-        await delay(250);
-        await draw(vietnamese, 50, 95, "writing xin chào");
-        await delay(250);
-      }
+      const status = language === "vi" ? "writing xin chào" : "writing hello";
+      update(10, status);
+      await draw(selected, 15, 95, status);
       await ready;
     } finally {
       await close();
