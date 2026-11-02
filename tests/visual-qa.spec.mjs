@@ -33,13 +33,14 @@ const captureRuntime = (page) => {
 };
 
 test("painted homepage has no cropped headings or illustration/footer collisions", async ({ page }, testInfo) => {
-  test.setTimeout(70000);
+  test.setTimeout(90000);
   await page.emulateMedia({ reducedMotion: "reduce" });
   const runtime = captureRuntime(page);
   const measurements = [];
   await page.goto("/?lang=en", { waitUntil: "domcontentloaded" });
   await expect(page.locator("#loader")).toHaveCount(0, { timeout: 8000 });
   await expect(page.locator("#binary-wave")).toHaveAttribute("data-wave-ready", "true");
+  await expect(page.locator("#retro-model")).toHaveAttribute("data-state", "ready", { timeout: 20000 });
 
   for (const viewport of viewports) {
     await page.setViewportSize(viewport);
@@ -122,7 +123,7 @@ test("painted homepage has no cropped headings or illustration/footer collisions
 });
 
 test("each theme paints a legible homepage while preserving the binary artwork", async ({ page }, testInfo) => {
-  test.setTimeout(60000);
+  test.setTimeout(90000);
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto("/", { waitUntil: "domcontentloaded" });
@@ -139,6 +140,7 @@ test("each theme paints a legible homepage while preserving the binary artwork",
     await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
     await expect(page.locator("#binary-wave")).toHaveAttribute("data-wave-color", waveColor);
     await expect(page.locator("#loader")).toHaveCount(0, { timeout: 8000 });
+    await expect(page.locator("#retro-model")).toHaveAttribute("data-state", "ready", { timeout: 20000 });
 
     const colors = await page.evaluate(() => {
       const paragraph = document.querySelector(".hero-editorial__copy p");
