@@ -33,5 +33,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: loader-layout-previews
-          path: test-results/**/layout-*.png
+          path: |
+            test-results/**/layout-*.png
+            test-results/**/visual-audit.json
           if-no-files-found: ignore
