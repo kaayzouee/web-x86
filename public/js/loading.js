@@ -25,7 +25,7 @@
   const selected = language === "vi" ? vietnamese : english;
   loader.dataset.language = language;
   for (const greeting of [english, vietnamese]) {
-    greeting.hidden = greeting !== selected;
+    greeting.toggleAttribute("hidden", greeting !== selected);
   }
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   let progress = 0;
@@ -61,7 +61,7 @@
 
   const draw = async (svg, from, to, status) => {
     for (const greeting of [english, vietnamese]) {
-      greeting.hidden = greeting !== svg;
+      greeting.toggleAttribute("hidden", greeting !== svg);
     }
     detail.textContent = status;
     const strokes = svg.querySelectorAll("path");
