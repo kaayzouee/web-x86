@@ -1,162 +1,186 @@
-/* Procedural binary surf. No images, fonts, or animation libraries required. */
+/* The binary tide: a pixel-art shoreline painted entirely with 0 and 1 glyphs.
+   Stable positions form coherent foam and waves; only the glyph values drift. */
 (() => {
   const canvas = document.getElementById("binary-wave");
-  if (!canvas) return;
-  const ctx = canvas.getContext("2d");
+  const ctx = canvas?.getContext("2d");
   if (!ctx) return;
 
   const root = document.documentElement;
-  const motionQuery = matchMedia("(prefers-reduced-motion: reduce)");
+  const motion = matchMedia("(prefers-reduced-motion: reduce)");
   let width = 0;
   let height = 0;
   let tick = 0;
-  let redrawQueued = false;
+  let queued = false;
 
-  // Stable positions give the binary sea structure; only some digits flip
-  // on each tick so the motion reads as a subtle data current, not a flash.
-  const hash = (a, b, c = 0) => {
-    const n = Math.sin(a * 127.1 + b * 311.7 + c * 71.9) * 43758.5453123;
-    return n - Math.floor(n);
+  const hash = (x, y, seed = 0) => {
+    const v = Math.sin(x * 127.1 + y * 311.7 + seed * 74.7) * 43758.5453123;
+    return v - Math.floor(v);
   };
-  const isReduced = () => motionQuery.matches || root.classList.contains("reduce-motion");
-  const css = (styles, key) => styles.getPropertyValue(key).trim();
-
-  const glyph = (x, y, row, col, size, color, alpha, salt = 0) => {
-    const base = hash(row, col, salt) > .5;
-    const flip = tick > 0 && hash(row, col, tick + salt * 13) > .78;
-    ctx.globalAlpha = alpha;
-    ctx.fillStyle = color;
-    ctx.font = "700 " + size + "px ui-monospace, SFMono-Regular, Consolas, monospace";
-    ctx.fillText(base !== flip ? "1" : "0", x, y);
+  const reduced = () => motion.matches || root.classList.contains("reduce-motion");
+  const color = (styles, name, fallback) => styles.getPropertyValue(name).trim() || fallback;
+  const drawDigit = (x, y, size, ink, opacity, row, col, seed = 0) => {
+    const base = hash(row, col, seed) > .5;
+    const change = tick && hash(row, col, tick * 3 + seed) > .76;
+    ctx.globalAlpha = opacity;
+    ctx.fillStyle = ink;
+    ctx.font = "700 " + Math.round(size) + "px ui-monospace, SFMono-Regular, Consolas, monospace";
+    ctx.fillText(base !== Boolean(change) ? "1" : "0", x, y);
   };
 
-  const drawCloud = (cx, cy, rx, ry, color, layer) => {
-    // A digit-built blocky foam bank, with scalloped edges like the clouds
-    // in the reference artwork. Far away means tiny and close to the paper.
-    for (let y = Math.max(18, cy - ry); y < cy + ry; y += 9) {
-      const ny = (y - cy) / ry;
-      for (let x = Math.max(0, cx - rx); x < Math.min(width, cx + rx); x += 9) {
-        const nx = (x - cx) / rx;
-        const scallop = .14 * Math.sin(x * .028) + .09 * Math.cos(x * .053);
-        if (nx * nx + (ny + scallop) * (ny + scallop) > .87) continue;
-        if (hash(Math.floor(x / 9), Math.floor(y / 9), 39 + layer) < .36) continue;
-        glyph(x, y, layer + 31, Math.floor(x / 9) + Math.floor(y / 9) * 79,
-          5, color, .12 + .16 * Math.max(0, ny + 1) / 2, 44 + layer);
+  // Distant banks use staggered pixel glyphs instead of a gradient or image.
+  // Their scalloped shapes follow the reference's blue cloud silhouettes.
+  const paintBank = (side, pale, foam, shadow) => {
+    const left = side === "left";
+    const xMin = left ? 0 : width * .68;
+    const xMax = left ? width * .32 : width;
+    const midX = left ? width * .06 : width * .94;
+    const step = width < 500 ? 7.6 : 8.7;
+    for (let y = height * .17, row = 0; y < height * .70; y += step, row++) {
+      for (let x = xMin, col = 0; x < xMax; x += step, col++) {
+        const centerDist = Math.abs(x - midX) / width;
+        const cap = left
+          ? .30 + .16 * Math.abs(Math.sin(x * .015 + .5)) + .13 * centerDist
+          : .26 + .18 * Math.abs(Math.cos(x * .018)) + .21 * centerDist;
+        const floor = .68 - .07 * Math.sin(x * .009);
+        if (y / height < cap || y / height > floor) continue;
+        const chance = hash(row, col, left ? 43 : 91);
+        if (chance < .14 + .2 * centerDist) continue;
+        const distanceToEdge = Math.abs(y / height - cap);
+        const ink = distanceToEdge < .06 ? foam : chance > .72 ? shadow : pale;
+        const alpha = distanceToEdge < .045 ? .52 : .20 + .21 * chance;
+        drawDigit(x, y, step * .88, ink, alpha, row + (left ? 17 : 37), col, 62);
       }
     }
   };
 
-  const drawWave = () => {
+  const crest = (x) => {
+    const t = x / width;
+    const leftSwell = .125 * Math.exp(-Math.pow((t + .035) / .19, 2));
+    const rightSwell = .13 * Math.exp(-Math.pow((t - .97) / .22, 2));
+    const wavelet = .022 * Math.sin(t * 17 + .3) + .012 * Math.sin(t * 39 - .8);
+    return height * (.57 - leftSwell - rightSwell + wavelet);
+  };
+
+  const render = () => {
     if (!width || !height) return;
     const styles = getComputedStyle(root);
-    const backdrop = css(styles, "--home-bg") || "#ffffff";
-    const faint = css(styles, "--home-pale") || "#eaf2ff";
-    const foam = css(styles, "--home-foam") || "#b4d0ff";
-    const vivid = css(styles, "--home-wave") || "#4d99fa";
-    const deep = css(styles, "--home-deep") || "#082a72";
-    const blue = css(styles, "--home-blue") || "#2869fa";
-    ctx.clearRect(0, 0, width, height);
-    ctx.fillStyle = backdrop;
+    const paper = color(styles, "--home-bg", "#ffffff");
+    const haze = color(styles, "--home-pale", "#eaf2ff");
+    const foam = color(styles, "--home-foam", "#b4d0ff");
+    const bright = color(styles, "--home-wave", "#4d99fa");
+    const ink = color(styles, "--home-deep", "#082a72");
+    const blue = color(styles, "--home-blue", "#2869fa");
+    const shadow = color(styles, "--home-shadow", "#aac5ef");
+
     ctx.globalAlpha = 1;
+    ctx.clearRect(0, 0, width, height);
+    ctx.fillStyle = paper;
     ctx.fillRect(0, 0, width, height);
     ctx.textBaseline = "top";
+    paintBank("left", haze, foam, shadow);
+    paintBank("right", haze, foam, shadow);
 
-    // Pale clouds/surf on opposite shores. These are made only of 0 and 1.
-    drawCloud(width * .05, height * .36, width * .23, height * .24, faint, 1);
-    drawCloud(width * .94, height * .32, width * .24, height * .21, foam, 2);
-    drawCloud(width * .63, height * .42, width * .15, height * .12, faint, 3);
+    // The far surf starts as a few tiny pale digits. In the foreground, digits
+    // get larger, tighter and darker; crests curl upward at the two shores.
+    for (let y = height * .30, row = 0; y < height + 20; row++) {
+      const depth = y / height;
+      const size = 5.2 + 13.4 * Math.pow(depth, 1.65);
+      const spacing = size * (depth > .76 ? 1.04 : 1.2);
+      const stepY = size * (depth > .76 ? .94 : 1.12);
+      for (let x = (row % 2) * spacing * .5, col = 0; x < width; x += spacing, col++) {
+        const surface = crest(x);
+        const offset = y - surface;
+        if (offset < -55) continue;
+        const r = hash(row, col, 7);
+        const foamZone = offset <= 42;
+        // Keep the sky genuinely empty and allow a lacy, broken foam edge.
+        if (offset < -20 && r < .87) continue;
+        if (offset < 10 && r < .4) continue;
+        if (offset >= 10 && offset < 70 && r < .22) continue;
+        if (offset >= 70 && r < Math.max(.04, .17 - depth * .13)) continue;
 
-    // Lines of surf get wider, darker and more legible as they approach.
-    let row = 0;
-    for (let y = height * .13; y < height + 18; ) {
-      const depth = Math.min(1, Math.max(0, y / height));
-      const size = Math.max(5, Math.round(4.5 + 11.5 * Math.pow(depth, 1.45)));
-      const gap = Math.max(8, size * 1.12);
-      const stepY = Math.max(8, size * 1.08);
-      const phase = row * .3;
-      for (let col = 0, x = (row % 2) * (gap / 2); x < width; col++, x += gap) {
-        const swell = Math.sin(x * .009 + .2) * 24
-          + Math.sin(x * .025 - .8) * 10
-          + Math.sin(x * .004 + y * .007) * 12;
-        const crest = height * .38 + swell
-          - 20 * Math.exp(-Math.pow((x - width * .75) / (width * .2), 2));
-        const foamEdge = Math.sin(x * .017 + phase) * 11;
-        if (y < crest - 34) continue;
-        if (y < crest + foamEdge && hash(row, col, 5) < .83) continue;
-        if (y < crest + 48 && hash(row, col, 7) < .27) continue;
-        if (y < height * .7 && hash(row, col, 9) < .13) continue;
-
-        const wavelet = Math.sin(x * .012 + y * .037) + Math.cos(x * .022 - y * .016);
-        const color = depth < .46 ? faint : depth < .62 ? foam
-          : depth < .8 ? vivid : (wavelet > .48 ? blue : deep);
-        const opacity = depth < .46 ? .35 : depth < .62 ? .51
-          : depth < .8 ? .7 : .79 + .18 * hash(row, col, 14);
-        const xOffset = Math.sin(y * .034 + x * .013) * (1 + depth * 2.5);
-        glyph(x + xOffset, y + Math.sin(x * .011 + phase) * 3.3,
-          row, col, size, color, opacity);
+        const ripple = Math.sin(x * .014 + y * .035) + Math.cos(x * .019 - y * .012);
+        let fill;
+        let alpha;
+        if (offset < 0) {
+          fill = foam;
+          alpha = .42 + r * .28;
+        } else if (foamZone) {
+          fill = r > .48 ? foam : bright;
+          alpha = .48 + r * .25;
+        } else if (depth < .67) {
+          fill = r > .66 ? bright : shadow;
+          alpha = .44 + .28 * r;
+        } else if (depth < .83) {
+          fill = ripple > .55 ? foam : bright;
+          alpha = .65 + .23 * r;
+        } else {
+          fill = ripple > 1.12 ? bright : r > .82 ? ink : blue;
+          alpha = .78 + .18 * r;
+        }
+        drawDigit(x + Math.sin(x * .008 + y * .027) * 2, y, size, fill, alpha,
+          row, col, 12);
       }
       y += stepY;
-      row++;
     }
 
-    // Bright broken ribbons suggest a rolling pixelated shoreline.
-    for (let band = 0; band < 4; band++) {
-      const depth = .54 + band * .105;
-      const baseline = height * depth;
-      const size = Math.round(6 + band * 2.3);
-      for (let x = 0, col = 0; x < width; x += size * 1.35, col++) {
-        if (hash(col, band, 26) < .38) continue;
-        const y = baseline + Math.sin(x * .01 + band * 1.8) * (12 + band * 5)
-          + Math.sin(x * .035 + band) * 5;
-        glyph(x, y, 210 + band, col, size,
-          band < 2 ? foam : vivid, .38 + band * .12, 33);
+    // Several irregular whitecaps create a readable wave direction rather
+    // than a uniformly textured carpet.
+    for (let band = 0; band < 5; band++) {
+      const h = height * (.56 + band * .082);
+      const size = 7 + band * 2;
+      for (let x = 0, col = 0; x < width; x += size * 1.32, col++) {
+        const surface = h + Math.sin(x * .011 + band * 1.7) * (10 + band * 3)
+          + Math.sin(x * .032 - band) * 5;
+        if (surface < crest(x) + 7 || hash(col, band, 28) < .43) continue;
+        drawDigit(x, surface, size, band < 3 ? foam : bright,
+          .40 + band * .095, 400 + band, col, 29);
       }
     }
+
     ctx.globalAlpha = 1;
     canvas.dataset.waveReady = "true";
     canvas.dataset.waveTick = String(tick);
     canvas.dataset.waveColor = blue;
-    canvas.dataset.waveReduced = String(isReduced());
+    canvas.dataset.waveReduced = String(reduced());
   };
 
-  const resizeAndDraw = () => {
+  const resize = () => {
     const rect = canvas.getBoundingClientRect();
-    const nextWidth = Math.round(rect.width);
-    const nextHeight = Math.round(rect.height);
-    if (!nextWidth || !nextHeight) return;
-    const ratio = Math.min(devicePixelRatio || 1, 2);
-    width = nextWidth;
-    height = nextHeight;
-    const scaledWidth = Math.round(width * ratio);
-    const scaledHeight = Math.round(height * ratio);
-    if (canvas.width !== scaledWidth || canvas.height !== scaledHeight) {
-      canvas.width = scaledWidth;
-      canvas.height = scaledHeight;
+    const w = Math.round(rect.width);
+    const h = Math.round(rect.height);
+    if (!w || !h) return;
+    width = w;
+    height = h;
+    const ratio = Math.min(window.devicePixelRatio || 1, 2);
+    const pixelWidth = Math.round(w * ratio);
+    const pixelHeight = Math.round(h * ratio);
+    if (canvas.width !== pixelWidth || canvas.height !== pixelHeight) {
+      canvas.width = pixelWidth;
+      canvas.height = pixelHeight;
     }
     ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-    drawWave();
-  };
-  const scheduleDraw = () => {
-    if (redrawQueued) return;
-    redrawQueued = true;
-    requestAnimationFrame(() => {
-      redrawQueued = false;
-      resizeAndDraw();
-    });
+    render();
   };
 
-  if ("ResizeObserver" in window) new ResizeObserver(scheduleDraw).observe(canvas);
-  else window.addEventListener("resize", scheduleDraw, { passive: true });
-  new MutationObserver(scheduleDraw).observe(root,
-    { attributes: true, attributeFilter: ["data-theme", "class"] });
-  if (motionQuery.addEventListener) motionQuery.addEventListener("change", scheduleDraw);
-  else motionQuery.addListener(scheduleDraw);
+  const queue = () => {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(() => { queued = false; resize(); });
+  };
+  if ("ResizeObserver" in window) new ResizeObserver(queue).observe(canvas);
+  else window.addEventListener("resize", queue, { passive: true });
+  new MutationObserver(queue).observe(root, {
+    attributes: true, attributeFilter: ["class", "data-theme"]
+  });
+  if (motion.addEventListener) motion.addEventListener("change", queue);
+  else motion.addListener(queue);
 
-  // Updating digits costs far less than a per-frame canvas animation.
+  // Update some digits, not all geometry. Pause while hidden or reduced.
   window.setInterval(() => {
-    if (isReduced() || document.hidden) return;
+    if (document.hidden || reduced()) return;
     tick++;
-    drawWave();
+    render();
   }, 1200);
-  scheduleDraw();
+  queue();
 })();
