@@ -35,13 +35,13 @@
     const xMax = left ? width * .32 : width;
     const midX = left ? width * .06 : width * .94;
     const step = width < 500 ? 7.6 : 8.7;
-    for (let y = height * .17, row = 0; y < height * .70; y += step, row++) {
+    for (let y = height * .06, row = 0; y < height * .75; y += step, row++) {
       for (let x = xMin, col = 0; x < xMax; x += step, col++) {
         const centerDist = Math.abs(x - midX) / width;
         const cap = left
-          ? .30 + .16 * Math.abs(Math.sin(x * .015 + .5)) + .13 * centerDist
-          : .26 + .18 * Math.abs(Math.cos(x * .018)) + .21 * centerDist;
-        const floor = .68 - .07 * Math.sin(x * .009);
+          ? .10 + .16 * Math.abs(Math.sin(x * .015 + .5)) + .10 * centerDist
+          : .08 + .17 * Math.abs(Math.cos(x * .018)) + .14 * centerDist;
+        const floor = .72 - .07 * Math.sin(x * .009);
         if (y / height < cap || y / height > floor) continue;
         const chance = hash(row, col, left ? 43 : 91);
         if (chance < .14 + .2 * centerDist) continue;
