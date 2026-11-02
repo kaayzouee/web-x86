@@ -125,3 +125,19 @@ test("editorial loader keeps hello and progress left of vintage computer collage
   await expect(loader.locator("#loader-progress")).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath("layout-mobile.png") });
 });
+
+test("hamburger settings persist across pages", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/?lang=en");
+  const menu = page.locator("#site-menu");
+  await menu.locator("summary").first().click();
+  await expect(menu).toHaveAttribute("open", "");
+  await menu.locator("#site-settings > summary").click();
+  await menu.locator('input[name="theme"][value="hacked"]').check();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "hacked");
+  await menu.locator("#motion-toggle").check();
+  await expect(page.locator("html")).toHaveClass(/reduce-motion/);
+  await page.goto("/public/history/index.html");
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "hacked");
+  await expect(page.locator("html")).toHaveClass(/reduce-motion/);
+});

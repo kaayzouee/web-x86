@@ -6,7 +6,7 @@
   const detail = document.getElementById("loader-detail");
   if (!loader || !bar || !fill || !percent || !detail) return;
 
-  const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches || (() => { try { return localStorage.getItem("x86-reduced-motion") === "true"; } catch { return false; } })();
   const english = loader.querySelector('.loader__hello[data-language="en"]');
   const vietnamese = loader.querySelector('.loader__hello[data-language="vi"]');
   const preference = (() => {

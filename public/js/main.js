@@ -13,7 +13,7 @@
     "ret"
   ];
 
-  if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches || (() => { try { return localStorage.getItem("x86-reduced-motion") === "true"; } catch { return false; } })()) {
     element.textContent = commands[0];
     return;
   }
@@ -61,4 +61,144 @@
     toggle.setAttribute("aria-label", active ? "Show description" : "Show assembly code");
     toggle.querySelector(".hero-toggle__code").setAttribute("aria-hidden", String(!active));
   });
+})();
+
+(() => {
+  const root = document.documentElement;
+  const read = (key) => { try { return localStorage.getItem(key); } catch { return null; } };
+  const save = (key, value) => { try { localStorage.setItem(key, value); } catch {} };
+  const themes = ["light", "dark", "navy", "hacked"];
+  const theme = themes.includes(read("x86-theme")) ? read("x86-theme") : "light";
+  const requested = new URLSearchParams(location.search).get("lang");
+  const saved = read("x86-language");
+  const language = ["en", "vi"].includes(requested) ? requested
+    : ["en", "vi"].includes(saved) ? saved
+    : navigator.language.toLowerCase().startsWith("vi") ? "vi" : "en";
+  const reduced = read("x86-reduced-motion") === "true";
+  root.dataset.theme = theme;
+  root.lang = language;
+  root.classList.toggle("reduce-motion", reduced);
+  const header = document.querySelector(".site-header__inner");
+  if (!header) return;
+  const links = [
+    ["introduction", "Overview"], ["history", "History"],
+    ["architecture", "Architecture"], ["instructions", "Instructions"], ["comparison", "Comparison"]
+  ];
+  const oldNav = header.querySelector(".site-nav");
+  const base = oldNav?.querySelector("a")?.getAttribute("href")?.split("public/")[0] ?? "../../";
+  const makeLink = (section, label) => {
+    const a = document.createElement("a");
+    a.href = base + "public/" + section + "/index.html";
+    a.textContent = label;
+    return a;
+  };
+  const menu = document.createElement("details");
+  menu.className = "site-menu";
+  menu.id = "site-menu";
+  const summary = document.createElement("summary");
+  summary.setAttribute("aria-label", "Open site menu");
+  summary.innerHTML = '<span class="menu-icon" aria-hidden="true"><i></i><i></i><i></i></span><span>Menu</span>';
+  const panel = document.createElement("div");
+  panel.className = "site-menu__panel";
+  const group = (title) => {
+    const details = document.createElement("details");
+    details.className = "site-menu__group";
+    const heading = document.createElement("summary");
+    heading.textContent = title;
+    details.append(heading);
+    panel.append(details);
+    return details;
+  };
+  const explore = group(language === "vi" ? "Khám phá" : "Explore");
+  const exploreNav = document.createElement("nav");
+  exploreNav.setAttribute("aria-label", "Explore");
+  links.forEach(([section, label]) => exploreNav.append(makeLink(section, label)));
+  explore.append(exploreNav);
+  const info = group(language === "vi" ? "Thông tin" : "Information");
+  const infoNav = document.createElement("nav");
+  infoNav.setAttribute("aria-label", "Information");
+  infoNav.append(makeLink("references", "References"), makeLink("license", "License"));
+  const github = document.createElement("a");
+  github.href = "https://github.com/kaayzouee/web-x86";
+  github.textContent = "GitHub";
+  infoNav.append(github);
+  info.append(infoNav);
+  const settings = group(language === "vi" ? "Cài đặt" : "Settings");
+  settings.id = "site-settings";
+  const options = (title, name, values, selected) => {
+    const field = document.createElement("fieldset");
+    field.className = "site-menu__options";
+    const legend = document.createElement("legend");
+    legend.textContent = title;
+    field.append(legend);
+    values.forEach(([value, label]) => {
+      const wrap = document.createElement("label");
+      const input = document.createElement("input");
+      input.type = "radio";
+      input.name = name;
+      input.value = value;
+      input.checked = value === selected;
+      wrap.append(input, document.createTextNode(label));
+      field.append(wrap);
+    });
+    settings.append(field);
+  };
+  options(language === "vi" ? "Giao diện" : "Theme", "theme",
+    [["light", "Light"], ["dark", "Dark"], ["navy", "Navy"], ["hacked", "Hacked!"]], theme);
+  options(language === "vi" ? "Ngôn ngữ" : "Language", "language",
+    [["en", "EN"], ["vi", "VI"]], language);
+  const motionLabel = document.createElement("label");
+  motionLabel.className = "site-menu__motion";
+  const motion = document.createElement("input");
+  motion.type = "checkbox";
+  motion.id = "motion-toggle";
+  motion.checked = reduced;
+  motionLabel.append(motion, document.createTextNode(language === "vi" ? "Giảm chuyển động" : "Reduced motion"));
+  settings.append(motionLabel);
+  menu.append(summary, panel);
+  header.append(menu);
+  root.classList.add("has-site-menu");
+
+  menu.addEventListener("change", (event) => {
+    const input = event.target;
+    if (input.name === "theme") {
+      root.dataset.theme = input.value;
+      save("x86-theme", input.value);
+    } else if (input.name === "language") {
+      save("x86-language", input.value);
+      const url = new URL(location.href);
+      url.searchParams.set("lang", input.value);
+      location.assign(url.href);
+    } else if (input.id === "motion-toggle") {
+      save("x86-reduced-motion", String(input.checked));
+      root.classList.toggle("reduce-motion", input.checked);
+      location.reload();
+    }
+  });
+  document.addEventListener("pointerdown", (event) => {
+    if (!menu.contains(event.target)) menu.open = false;
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && menu.open) {
+      menu.open = false;
+      summary.focus();
+    }
+  });
+  if (matchMedia("(hover: hover) and (pointer: fine)").matches) {
+    let closeTimer;
+    menu.addEventListener("mouseenter", () => {
+      clearTimeout(closeTimer);
+      menu.open = true;
+    });
+    menu.addEventListener("mouseleave", () => {
+      closeTimer = setTimeout(() => { menu.open = false; }, 250);
+    });
+  }
+  for (const item of panel.querySelectorAll(".site-menu__group")) {
+    item.addEventListener("toggle", () => {
+      if (item.open) panel.querySelectorAll(".site-menu__group").forEach((other) => {
+        if (other !== item) other.open = false;
+      });
+    });
+  }
 })();
