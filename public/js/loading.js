@@ -28,6 +28,7 @@
     greeting.toggleAttribute("hidden", greeting !== selected);
   }
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  const startedAt = performance.now();
   let progress = 0;
   let closed = false;
   const watchdog = setTimeout(() => {
@@ -53,6 +54,7 @@
     bar.setAttribute("aria-valuenow", "100");
     detail.textContent = "ready";
     loader.classList.add("is-ready");
+    if (reducedMotion) await delay(Math.max(0, 1000 - (performance.now() - startedAt)));
     await delay(reducedMotion ? 0 : 500);
     loader.classList.add("is-leaving");
     await delay(reducedMotion ? 0 : 500);
