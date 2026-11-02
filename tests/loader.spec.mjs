@@ -249,7 +249,7 @@ test("themes survive reload, invalid saved values are ignored, and every page re
     await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
     await page.reload();
     await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
-    await expect(page.locator("body")).toHaveCSS("background-color", theme === "light" ? "rgb(244, 244, 244)" : theme === "dark" ? "rgb(0, 0, 0)" : theme === "navy" ? "rgb(0, 28, 68)" : "rgb(3, 10, 4)");
+    await expect(page.locator("body")).toHaveCSS("background-color", theme === "light" ? "rgb(255, 255, 255)" : theme === "dark" ? "rgb(0, 0, 0)" : theme === "navy" ? "rgb(0, 28, 68)" : "rgb(3, 10, 4)");
     await page.goto("/public/history/index.html");
     await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
     await page.goto("/");
