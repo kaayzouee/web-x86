@@ -11,70 +11,90 @@
   const vietnamese = loader.querySelector('.loader__hello[data-language="vi"]');
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   let progress = 0;
+  let closed = false;
 
   const update = (next, status) => {
-    progress = Math.max(progress, next);
+    if (closed) return;
+    progress = Math.max(progress, Math.min(100, Math.round(next)));
     fill.style.width = progress + "%";
     percent.textContent = progress + "%";
     bar.setAttribute("aria-valuenow", String(progress));
     detail.textContent = status;
   };
 
-  const draw = async (svg) => {
+  const close = async () => {
+    if (closed) return;
+    closed = true;
+    fill.style.width = "100%";
+    percent.textContent = "100%";
+    bar.setAttribute("aria-valuenow", "100");
+    detail.textContent = "ready";
+    loader.classList.add("is-ready");
+    await delay(reducedMotion ? 0 : 850);
+    loader.classList.add("is-leaving");
+    await delay(reducedMotion ? 0 : 500);
+    loader.remove();
+  };
+
+  const draw = async (svg, from, to, status) => {
     svg.hidden = false;
     const strokes = svg.querySelectorAll("path");
     if (reducedMotion) {
       strokes.forEach((stroke) => { stroke.style.strokeDashoffset = "0"; });
+      update(to, status);
       return;
     }
+
+    const duration = Number(svg.dataset.duration) || 3500;
+    const started = performance.now();
+    update(from, status);
 
     await new Promise((resolve) => {
       const last = strokes[strokes.length - 1];
       last.addEventListener("animationend", resolve, { once: true });
       svg.classList.add("is-writing");
-      setTimeout(resolve, Number(svg.dataset.duration) + 500);
+
+      const tick = setInterval(() => {
+        if (closed) return clearInterval(tick);
+        const fraction = Math.min(1, (performance.now() - started) / duration);
+        update(from + (to - from) * fraction, status);
+      }, 80);
+
+      setTimeout(() => {
+        clearInterval(tick);
+        resolve();
+      }, duration + 500);
     });
+
+    update(to, status);
   };
 
-  const resourcesReady = (async () => {
-    update(20, "loading html");
-    update(45, "loading styles");
-    update(70, "loading javascript");
-
+  const ready = (async () => {
     if (document.readyState !== "complete") {
       await Promise.race([
         new Promise((resolve) => window.addEventListener("load", resolve, { once: true })),
         delay(5000)
       ]);
     }
-
-    update(90, "checking assets");
     await Promise.race([document.fonts ? document.fonts.ready : Promise.resolve(), delay(2000)]);
   })();
 
   const run = async () => {
     try {
-      update(20, "writing hello");
-      await draw(english);
+      update(10, "loading assets");
+      await draw(english, 15, 45, "writing hello");
       if (!reducedMotion) {
-        await delay(950);
+        await delay(550);
         english.hidden = true;
-        update(90, "writing xin chào");
-        await draw(vietnamese);
-        await delay(950);
+        await draw(vietnamese, 50, 95, "writing xin chào");
+        await delay(550);
       }
-
-      await resourcesReady;
-      update(100, "ready");
-      loader.classList.add("is-ready");
-      await delay(reducedMotion ? 0 : 850);
-      loader.classList.add("is-leaving");
-      await delay(reducedMotion ? 0 : 500);
-      loader.remove();
-    } catch {
-      loader.remove();
+      await ready;
+    } finally {
+      await close();
     }
   };
 
-  run();
+  const fallback = setTimeout(close, 17000);
+  run().finally(() => clearTimeout(fallback));
 })();
