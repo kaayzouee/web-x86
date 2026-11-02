@@ -51,7 +51,7 @@ test("painted homepage has no cropped headings or illustration/footer collisions
     const square = await rect(page.locator(".hero-stamp"));
     const title = await rect(page.locator("#home-title"));
     const scene = await rect(page.locator(".binary-scene"));
-    const station = await rect(page.locator(".workstation"));
+    const station = await rect(page.locator(".retro-model"));
     const footer = await rect(page.locator(".home-footer"));
     const label = await rect(page.locator(".binary-scene__label"));
 
@@ -61,23 +61,16 @@ test("painted homepage has no cropped headings or illustration/footer collisions
     expect(logo.y + logo.height).toBeLessThanOrEqual(square.y + square.height + 1);
     await expect(page.locator(".hero-stamp__logo")).toHaveText("X86");
 
-    const screen = await rect(page.locator(".workstation__screen"));
-    const mark = await rect(page.locator(".workstation__screen-mark"));
-    expect(mark.width).toBeLessThan(screen.width * .8);
-    expect(mark.y + mark.height).toBeLessThan(screen.y + screen.height * .85);
-    const faces = await page.locator(".workstation__monitor").evaluate((element) => ({
-      top: getComputedStyle(element, "::before").clipPath,
-      side: getComputedStyle(element, "::after").clipPath
-    }));
-    expect(faces.top).not.toBe("none");
-    expect(faces.side).not.toBe("none");
+    await expect(page.locator(".workstation")).toHaveCount(0);
+    await expect(page.locator("#retro-computer")).toHaveAttribute("data-asset-ready", "true");
+    await expect(page.locator("#retro-computer")).toHaveAttribute("alt", /retro computer/);
 
     expect(Math.abs(square.width - square.height)).toBeLessThan(2);
     expect(square.y).toBeGreaterThanOrEqual(header.y + header.height - 5);
     expect(title.y).toBeGreaterThanOrEqual(square.y + square.height - 3);
-    expect(station.y).toBeGreaterThan(scene.y + scene.height * .15);
-    expect(station.y + station.height).toBeLessThan(scene.y + scene.height - 18);
-    expect(label.y + label.height).toBeLessThan(station.y);
+    expect(station.y).toBeGreaterThan(scene.y + 10);
+    expect(station.y + station.height).toBeLessThan(scene.y + scene.height - 10);
+    expect(label.y + label.height).toBeLessThan(station.y + 5);
     expect(footer.y).toBeGreaterThanOrEqual(scene.y + scene.height - 2);
 
     const canvas = page.locator("#binary-wave");
