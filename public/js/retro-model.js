@@ -9,6 +9,8 @@
     fallback.textContent = "3D preview unavailable.";
   };
 
+  import("https://ajax.googleapis.com/ajax/libs/model-viewer/4.4.0/model-viewer.min.js").catch(fail);
+
   viewer.addEventListener("load", () => {
     wrapper.dataset.state = "ready";
   });
@@ -26,7 +28,7 @@
     })
     .then(blob => {
       const url = URL.createObjectURL(new Blob([blob], { type: "model/gltf-binary" }));
-      viewer.src = url;
+      viewer.setAttribute("src", url);
       viewer.dataset.assetReady = "true";
       window.addEventListener("pagehide", () => URL.revokeObjectURL(url), { once: true });
     })
