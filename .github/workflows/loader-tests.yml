@@ -1,0 +1,29 @@
+name: Loader browser tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install Playwright
+        run: npm install --no-save @playwright/test@1.56.1
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: Test loading screen
+        run: npx playwright test
+      - name: Save screenshots and traces on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: loader-test-results
+          path: test-results/
+          if-no-files-found: ignore

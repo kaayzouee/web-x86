@@ -19,9 +19,11 @@
     }
   })();
   const requested = new URLSearchParams(location.search).get("lang");
-  const configured = (requested === "en" || requested === "vi") ? requested : preference;
-  const language = (configured || document.documentElement.lang || navigator.language || "en").toLowerCase().startsWith("vi") ? "vi" : "en";
+  const saved = preference && /^(en|vi)(-|$)/i.test(preference) ? preference : null;
+  const configured = (requested === "en" || requested === "vi") ? requested : saved;
+  const language = (configured || navigator.language || document.documentElement.lang || "en").toLowerCase().startsWith("vi") ? "vi" : "en";
   const selected = language === "vi" ? vietnamese : english;
+  loader.dataset.language = language;
   for (const greeting of [english, vietnamese]) {
     greeting.hidden = greeting !== selected;
   }
