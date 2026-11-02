@@ -132,6 +132,8 @@ test("hamburger settings persist across pages", async ({ page }) => {
   const menu = page.locator("#site-menu");
   await menu.locator("summary").first().click();
   await expect(menu).toHaveAttribute("open", "");
+  await expect(menu.locator("summary").first()).toHaveAttribute("aria-label", "Toggle site menu");
+  await expect(menu.locator("summary").first()).not.toContainText("Menu");
   await menu.locator("#site-settings > summary").click();
   await menu.locator('input[name="theme"][value="hacked"]').check();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "hacked");
@@ -140,4 +142,21 @@ test("hamburger settings persist across pages", async ({ page }) => {
   await page.goto("/public/history/index.html");
   await expect(page.locator("html")).toHaveAttribute("data-theme", "hacked");
   await expect(page.locator("html")).toHaveClass(/reduce-motion/);
+});
+
+test("theme labels and high contrast palette are applied", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/?lang=en");
+  const menu = page.locator("#site-menu");
+  await menu.locator("summary").first().click();
+  await menu.locator("#site-settings > summary").click();
+  await expect(menu.locator('input[name="theme"][value="light"]').locator("..")).toContainText("Default");
+  await expect(menu.locator('input[name="theme"][value="dark"]').locator("..")).toContainText("High Contrast");
+  await menu.locator('input[name="theme"][value="dark"]').check();
+  await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+  const colors = await page.locator("html").evaluate((root) => {
+    const style = getComputedStyle(root);
+    return ["--paper", "--white", "--accent", "--ink", "--highlight", "--teal", "--secondary-accent"].map((name) => style.getPropertyValue(name).trim().toUpperCase());
+  });
+  expect(colors).toEqual(["#000000", "#1E1E2F", "#FF4500", "#F8F8FF", "#FFEA00", "#00CED1", "#8A2BE2"]);
 });
