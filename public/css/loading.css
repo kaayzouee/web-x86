@@ -51,16 +51,20 @@
   overflow: visible;
 }
 
+.loader__hello[hidden] { display: none; }
+
 .loader__hello path {
-  stroke-dasharray: 100;
-  stroke-dashoffset: 100;
-  animation: loader-write 520ms cubic-bezier(.28,.05,.3,1) forwards;
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
 }
 
-.loader__hello path:nth-child(2) { animation-delay: 520ms; }
-.loader__hello path:nth-child(3) { animation-delay: 1040ms; }
-.loader__hello path:nth-child(4) { animation-delay: 1560ms; }
-.loader__hello path:nth-child(5) { animation-delay: 2080ms; }
+.loader__hello path.loader__accent {
+  stroke: var(--loading-bright);
+}
+
+.loader__hello.is-writing path {
+  animation: loader-write var(--duration) ease-in-out var(--delay) forwards;
+}
 
 .loader__meet {
   position: absolute;

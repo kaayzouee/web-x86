@@ -4,20 +4,41 @@
   const fill = document.getElementById("loader-fill");
   const percent = document.getElementById("loader-percent");
   const detail = document.getElementById("loader-detail");
-
   if (!loader || !bar || !fill || !percent || !detail) return;
 
   const reducedMotion = matchMedia("(prefers-reduced-motion: reduce)").matches;
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  const preference = (() => {
+    try { return localStorage.getItem("x86-language") || localStorage.getItem("language") || localStorage.getItem("lang"); }
+    catch { return null; }
+  })();
+  const language = (preference || navigator.language || "en").toLowerCase().startsWith("vi") ? "vi" : "en";
+  const svg = loader.querySelector(`.loader__hello[data-language="${language}"]`);
+  loader.querySelectorAll(".loader__hello").forEach((item) => { item.hidden = item !== svg; });
+
+  const strokes = Array.from(svg.querySelectorAll("path"));
+  const writingDone = new Promise((resolve) => {
+    if (reducedMotion || !strokes.length) {
+      strokes.forEach((stroke) => { stroke.style.strokeDashoffset = "0"; });
+      resolve();
+      return;
+    }
+
+    let elapsed = 0;
+    strokes.forEach((stroke, index) => {
+      const duration = language === "vi" ? 370 : 500;
+      stroke.style.setProperty("--delay", elapsed + "ms");
+      stroke.style.setProperty("--duration", duration + "ms");
+      elapsed += duration;
+      if (index === strokes.length - 1) stroke.addEventListener("animationend", resolve, { once: true });
+    });
+
+    svg.classList.add("is-writing");
+    setTimeout(resolve, elapsed + 1000);
+  });
+
   let value = 0;
   let finished = false;
-  const lastStroke = loader.querySelector(".loader__hello path:last-child");
-  const writingDone = reducedMotion || !lastStroke
-    ? Promise.resolve()
-    : Promise.race([
-        new Promise((resolve) => lastStroke.addEventListener("animationend", resolve, { once: true })),
-        delay(3100)
-      ]);
 
   const update = (next, status) => {
     value = Math.max(value, next);
