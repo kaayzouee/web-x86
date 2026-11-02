@@ -1,5 +1,3 @@
-/* The binary tide: a pixel-art shoreline painted entirely with 0 and 1 glyphs.
-   Stable positions form coherent foam and waves; only the glyph values drift. */
 (() => {
   const canvas = document.getElementById("binary-wave");
   const ctx = canvas?.getContext("2d");
@@ -53,12 +51,27 @@
     }
   };
 
+  const paintHorizon = (haze, foam) => {
+    const step = width < 500 ? 10 : 12;
+    for (let y = height * .18, row = 0; y < height * .7; y += step, row++) {
+      for (let x = 0, col = 0; x < width; x += step, col++) {
+        const start = height * (.19 + .045 * Math.sin(x * .012));
+        if (y < start) continue;
+        const depth = (y - start) / (height * .5);
+        const chance = hash(row, col, 19);
+        if (chance > .23 + depth * .45) continue;
+        drawDigit(x, y, 5 + depth * 5, chance > .7 ? foam : haze,
+          .22 + depth * .26, row + 800, col, 20);
+      }
+    }
+  };
+
   const crest = (x) => {
     const t = x / width;
     const leftSwell = .125 * Math.exp(-Math.pow((t + .035) / .19, 2));
     const rightSwell = .13 * Math.exp(-Math.pow((t - .97) / .22, 2));
     const wavelet = .022 * Math.sin(t * 17 + .3) + .012 * Math.sin(t * 39 - .8);
-    return height * (.57 - leftSwell - rightSwell + wavelet);
+    return height * (.50 - leftSwell - rightSwell + wavelet);
   };
 
   const render = () => {
@@ -77,11 +90,10 @@
     ctx.fillStyle = paper;
     ctx.fillRect(0, 0, width, height);
     ctx.textBaseline = "top";
+    paintHorizon(haze, foam);
     paintBank("left", haze, foam, shadow);
     paintBank("right", haze, foam, shadow);
 
-    // The far surf starts as a few tiny pale digits. In the foreground, digits
-    // get larger, tighter and darker; crests curl upward at the two shores.
     for (let y = height * .30, row = 0; y < height + 20; row++) {
       const depth = y / height;
       const size = 5.2 + 13.4 * Math.pow(depth, 1.65);
@@ -93,7 +105,6 @@
         if (offset < -55) continue;
         const r = hash(row, col, 7);
         const foamZone = offset <= 42;
-        // Keep the sky genuinely empty and allow a lacy, broken foam edge.
         if (offset < -20 && r < .87) continue;
         if (offset < 10 && r < .4) continue;
         if (offset >= 10 && offset < 70 && r < .22) continue;
@@ -124,8 +135,6 @@
       y += stepY;
     }
 
-    // Several irregular whitecaps create a readable wave direction rather
-    // than a uniformly textured carpet.
     for (let band = 0; band < 5; band++) {
       const h = height * (.56 + band * .082);
       const size = 7 + band * 2;
@@ -176,7 +185,6 @@
   if (motion.addEventListener) motion.addEventListener("change", queue);
   else motion.addListener(queue);
 
-  // Update some digits, not all geometry. Pause while hidden or reduced.
   window.setInterval(() => {
     if (document.hidden || reduced()) return;
     tick++;
