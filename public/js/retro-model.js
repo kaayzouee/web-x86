@@ -22,9 +22,14 @@
   }
 
   fetch("public/assets/models/retro-computer.glb.gz")
-    .then(response => {
-      if (!response.ok || !response.body) throw new Error("Model not found");
-      return new Response(response.body.pipeThrough(new DecompressionStream("gzip"))).blob();
+    .then(async response => {
+      if (!response.ok) throw new Error("Model not found");
+      const bytes = await response.arrayBuffer();
+      const header = new Uint8Array(bytes, 0, 2);
+      if (header[0] !== 31 || header[1] !== 139) return new Blob([bytes]);
+      return new Response(new Blob([bytes]).stream().pipeThrough(
+        new DecompressionStream("gzip")
+      )).blob();
     })
     .then(blob => {
       const url = URL.createObjectURL(new Blob([blob], { type: "model/gltf-binary" }));
