@@ -184,7 +184,7 @@ html.home-page .home-main {
   position: relative;
   isolation: isolate;
   width: 100%;
-  height: clamp(400px, 43vw, 630px);
+  height: clamp(460px, 47vw, 660px);
   margin-top: clamp(52px, 8.3vw, 132px);
   overflow: hidden;
   background: var(--home-bg);
@@ -219,10 +219,10 @@ html.home-page .home-main {
   position: absolute;
   z-index: 2;
   left: 50%;
-  bottom: 20px;
+  bottom: clamp(56px, 6vw, 82px);
   transform: translateX(-50%);
-  width: min(66vw, 670px);
-  height: clamp(210px, 28vw, 340px);
+  width: min(60vw, 610px);
+  height: clamp(210px, 26vw, 330px);
   filter: drop-shadow(0 8px 0 var(--home-shadow));
 }
 .workstation__monitor {
@@ -365,9 +365,9 @@ html.home-page .home-footer {
   .editorial-hero__wordmark { font-size: clamp(56px, 12.2vw, 86px); margin-top: 17px; }
   .editorial-hero__captions { font-size: clamp(10px, 2vw, 14px); gap: 9px; }
   .editorial-hero__link { margin-top: 20px; }
-  .binary-scene { height: 440px; margin-top: 56px; }
+  .binary-scene { height: 480px; margin-top: 56px; }
   .binary-scene__label { left: 22px; right: 22px; font-size: 9px; }
-  .workstation { width: min(92vw, 470px); height: 270px; bottom: 27px; }
+  .workstation { width: min(84vw, 425px); height: 255px; bottom: 68px; }
   .workstation__screen-mark { font-size: clamp(36px, 9vw, 67px); }
   .binary-scene__note { font-size: 9px; right: 20px; }
   .home-footer__inner { flex-wrap: wrap; gap: 18px; padding: 24px 22px; }
@@ -380,10 +380,21 @@ html.home-page .home-footer {
   .hero-editorial__copy p { font-size: 10px; }
   .editorial-hero__wordmark { font-size: 12vw; }
   .binary-scene__label span { display: none; }
-  .workstation { width: 95vw; }
+  .workstation { width: 86vw; }
 }
 @media (prefers-reduced-motion: reduce) {
   .binary-scene__canvas, .workstation { animation: none !important; }
 }
 html.reduce-motion .binary-scene__canvas,
 html.reduce-motion .workstation { animation: none !important; }
+
+/* Give the wave a breathable shoreline, with room beneath the desk and no
+   text overlay on the foreground digits. */
+.binary-scene { border-bottom: 1px solid var(--home-wave); }
+.workstation__monitor { box-shadow: 8px -7px 0 var(--home-shadow); }
+.workstation__screen { background-color: var(--home-pale); }
+.workstation__desk { box-shadow: 0 7px 0 var(--home-wave); }
+@media (max-width: 700px) {
+  .binary-scene__label { top: 14px; }
+  .workstation__tower { right: 3%; }
+}
