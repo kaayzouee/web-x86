@@ -77,7 +77,10 @@ test("editorial home keeps navigation, large x86 stamp, and no CRT terminal", as
   await expect(page.locator(".site-nav a")).toHaveCount(5);
   await expect(page.locator("#site-menu > summary")).toBeVisible();
   await expect(page.locator(".crt-terminal, #crt-toggle, #crt-source")).toHaveCount(0);
-  await expect(page.locator(".workstation")).toBeVisible();
+  await expect(page.locator("#retro-model")).toBeVisible();
+  await expect(page.locator("#retro-computer")).toHaveAttribute("data-asset-ready", "true");
+  await expect(page.locator(".workstation")).toHaveCount(0);
+  await expect(page.locator(".binary-scene__credit")).toContainText("Tobalation");
   await expect(page.locator("#binary-wave")).toHaveAttribute("data-wave-ready", "true");
   await expect(page.locator(".editorial-hero__link")).toHaveAttribute("href", "public/introduction/index.html");
   await page.screenshot({ path: testInfo.outputPath("layout-home-desktop.png"), fullPage: true });
@@ -290,4 +293,31 @@ test("theme selection works when storage access is blocked", async ({ page }) =>
   await page.locator("#site-settings > summary").click();
   await page.locator('input[name="theme"][value="dark"]').check();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+});
+
+test("uploaded retro computer model decodes as a valid local GLB", async ({ page }) => {
+  await page.goto("/");
+  const model = await page.evaluate(async () => {
+    const response = await fetch("/public/assets/models/retro-computer.glb.gz");
+    if (!response.ok) return { status: response.status };
+    const bytes = await new Response(
+      response.body.pipeThrough(new DecompressionStream("gzip"))
+    ).arrayBuffer();
+    return {
+      status: response.status,
+      signature: String.fromCharCode(...new Uint8Array(bytes, 0, 4)),
+      size: bytes.byteLength
+    };
+  });
+  expect(model).toEqual({ status: 200, signature: "glTF", size: 33640 });
+});
+
+test("3D model failure offers a readable fallback", async ({ page }) => {
+  await page.route("**/retro-computer.glb.gz", route => route.abort());
+  await page.goto("/");
+  await expect(page.locator("#retro-model")).toHaveAttribute("data-state", "error");
+  await expect(page.locator(".retro-model__fallback")).toContainText("unavailable");
+  await expect(page.locator(".binary-scene__credit")).toHaveAttribute(
+    "href", /sketchfab\\.com/
+  );
 });
