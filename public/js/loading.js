@@ -12,6 +12,10 @@
   const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   let progress = 0;
   let closed = false;
+  const watchdog = setTimeout(() => {
+    loader.classList.add("is-leaving");
+    loader.remove();
+  }, 16000);
 
   const update = (next, status) => {
     if (closed) return;
@@ -25,12 +29,13 @@
   const close = async () => {
     if (closed) return;
     closed = true;
+    clearTimeout(watchdog);
     fill.style.width = "100%";
     percent.textContent = "100%";
     bar.setAttribute("aria-valuenow", "100");
     detail.textContent = "ready";
     loader.classList.add("is-ready");
-    await delay(reducedMotion ? 0 : 850);
+    await delay(reducedMotion ? 0 : 500);
     loader.classList.add("is-leaving");
     await delay(reducedMotion ? 0 : 500);
     loader.remove();
@@ -95,6 +100,5 @@
     }
   };
 
-  const fallback = setTimeout(close, 17000);
-  run().finally(() => clearTimeout(fallback));
+  run().catch(() => close());
 })();
