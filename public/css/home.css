@@ -185,8 +185,8 @@ html.home-page .home-main {
   position: relative;
   isolation: isolate;
   width: 100%;
-  height: clamp(460px, 47vw, 660px);
-  margin-top: clamp(52px, 8.3vw, 132px);
+  height: clamp(380px, 40vw, 590px);
+  margin-top: clamp(20px, 4vw, 60px);
   overflow: hidden;
   background: var(--home-bg);
 }
@@ -366,7 +366,7 @@ html.home-page .home-footer {
   .editorial-hero__wordmark { font-size: clamp(63px, 13.9vw, 100px); margin-top: 17px; }
   .editorial-hero__captions { font-size: clamp(10px, 2vw, 14px); gap: 9px; }
   .editorial-hero__link { margin-top: 20px; }
-  .binary-scene { height: 480px; margin-top: 56px; }
+  .binary-scene { height: 430px; margin-top: 40px; }
   .binary-scene__label { left: 22px; right: 22px; font-size: 9px; }
   .workstation { width: min(84vw, 425px); height: 255px; bottom: 68px; }
   .workstation__screen-mark { font-size: clamp(36px, 9vw, 67px); }
