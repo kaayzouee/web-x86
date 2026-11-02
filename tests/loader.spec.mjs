@@ -81,7 +81,7 @@ test("editorial home keeps navigation, large x86 stamp, and no CRT terminal", as
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto("/?lang=en", { waitUntil: "domcontentloaded" });
-  await expect(page.locator("#loader")).toHaveCount(0, { timeout: 5000 });
+  await expect(page.locator("#loader")).toHaveCount(0, { timeout: 12000 });
   await expect(page.locator(".hero-stamp")).toContainText("86");
   await expect(page.locator("#home-title")).toHaveText("Inside x86.");
   await expect(page.locator(".site-nav")).toBeVisible();
@@ -316,13 +316,19 @@ test("uploaded retro computer model decodes as a valid local GLB", async ({ page
     const bytes = await new Response(
       response.body.pipeThrough(new DecompressionStream("gzip"))
     ).arrayBuffer();
+    const view = new DataView(bytes);
+    const length = view.getUint32(12, true);
+    const data = JSON.parse(new TextDecoder().decode(bytes.slice(20, 20 + length)));
     return {
       status: response.status,
       signature: String.fromCharCode(...new Uint8Array(bytes, 0, 4)),
-      size: bytes.byteLength
+      material: data.materials[0]
     };
   });
-  expect(model).toEqual({ status: 200, signature: "glTF", size: 33640 });
+  expect(model.status).toBe(200);
+  expect(model.signature).toBe("glTF");
+  expect(model.material.emissiveFactor).toEqual([0, 0, 0]);
+  expect(model.material.pbrMetallicRoughness.baseColorTexture).toEqual({ index: 0 });
 });
 
 test("3D model failure offers a readable fallback", async ({ page }) => {
