@@ -96,8 +96,8 @@
   menu.className = "site-menu";
   menu.id = "site-menu";
   const summary = document.createElement("summary");
-  summary.setAttribute("aria-label", "Open site menu");
-  summary.innerHTML = '<span class="menu-icon" aria-hidden="true"><i></i><i></i><i></i></span><span>Menu</span>';
+  summary.setAttribute("aria-label", "Toggle site menu");
+  summary.innerHTML = '<span class="menu-icon" aria-hidden="true"><i></i><i></i><i></i></span>';
   const panel = document.createElement("div");
   panel.className = "site-menu__panel";
   const group = (title) => {
@@ -144,7 +144,7 @@
     settings.append(field);
   };
   options(language === "vi" ? "Giao diện" : "Theme", "theme",
-    [["light", "Light"], ["dark", "Dark"], ["navy", "Navy"], ["hacked", "Hacked!"]], theme);
+    [["light", "Default"], ["dark", "High Contrast"], ["navy", "Navy"], ["hacked", "Hacked!"]], theme);
   options(language === "vi" ? "Ngôn ngữ" : "Language", "language",
     [["en", "EN"], ["vi", "VI"]], language);
   const motionLabel = document.createElement("label");
@@ -184,16 +184,6 @@
       summary.focus();
     }
   });
-  if (matchMedia("(hover: hover) and (pointer: fine)").matches) {
-    let closeTimer;
-    menu.addEventListener("mouseenter", () => {
-      clearTimeout(closeTimer);
-      menu.open = true;
-    });
-    menu.addEventListener("mouseleave", () => {
-      closeTimer = setTimeout(() => { menu.open = false; }, 250);
-    });
-  }
   for (const item of panel.querySelectorAll(".site-menu__group")) {
     item.addEventListener("toggle", () => {
       if (item.open) panel.querySelectorAll(".site-menu__group").forEach((other) => {
