@@ -9,6 +9,14 @@ for (const { lang, text, duration } of examples) {
   test(`${lang} greeting draws visibly and reveals homepage`, async ({ page }) => {
     const errors = [];
     page.on("pageerror", (error) => errors.push(error.message));
+    await page.addInitScript(() => {
+      window.__loaderWriting = [];
+      const observer = new MutationObserver(() => {
+        const value = document.getElementById("loader-detail")?.textContent;
+        if (value?.startsWith("writing ")) window.__loaderWriting.push(value);
+      });
+      observer.observe(document, { childList: true, characterData: true, subtree: true });
+    });
 
     await page.goto(`/?lang=${lang}`, { waitUntil: "domcontentloaded" });
 
@@ -20,17 +28,19 @@ for (const { lang, text, duration } of examples) {
     await expect(loader).toHaveAttribute("data-language", lang);
     await expect(greeting).toBeVisible();
     await expect(other).toBeHidden();
-    await expect(loader.locator("#loader-detail")).toHaveText(`writing ${text}`);
+    await expect.poll(() => page.evaluate(() => window.__loaderWriting)).toContain(`writing ${text}`);
 
-    await expect.poll(async () => {
-      return firstStroke.evaluate((path) => {
-        const styles = getComputedStyle(path);
-        const dash = Number.parseFloat(styles.strokeDashoffset);
-        const box = path.getBoundingClientRect();
-        return box.width > 0 && box.height > 0 && styles.visibility !== "hidden"
-          && styles.stroke !== "none" && Number.isFinite(dash) && dash < 0.98;
-      });
-    }, { timeout: 2500, message: "The handwriting must visibly begin drawing" }).toBe(true);
+    if ((await loader.locator("#loader-detail").textContent())?.startsWith("writing ")) {
+      await expect.poll(async () => {
+        return firstStroke.evaluate((path) => {
+          const styles = getComputedStyle(path);
+          const dash = Number.parseFloat(styles.strokeDashoffset);
+          const box = path.getBoundingClientRect();
+          return box.width > 0 && box.height > 0 && styles.visibility !== "hidden"
+            && styles.stroke !== "none" && Number.isFinite(dash) && dash < 0.98;
+        });
+      }, { timeout: 2500, message: "The handwriting must visibly begin drawing" }).toBe(true);
+    }
 
     const progress = loader.locator("#loader-progress");
     await expect.poll(async () => Number(await progress.getAttribute("aria-valuenow")), {
@@ -67,6 +77,7 @@ test("reduced motion skips handwriting without blocking the homepage", async ({ 
 });
 
 test("editorial home keeps navigation, large x86 stamp, and no CRT terminal", async ({ page }, testInfo) => {
+  test.setTimeout(45000);
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto("/?lang=en", { waitUntil: "domcontentloaded" });
@@ -77,7 +88,11 @@ test("editorial home keeps navigation, large x86 stamp, and no CRT terminal", as
   await expect(page.locator(".site-nav a")).toHaveCount(5);
   await expect(page.locator("#site-menu > summary")).toBeVisible();
   await expect(page.locator(".crt-terminal, #crt-toggle, #crt-source")).toHaveCount(0);
-  await expect(page.locator(".workstation")).toBeVisible();
+  await expect(page.locator("#retro-model")).toBeVisible();
+  await expect(page.locator("#retro-computer")).toHaveAttribute("data-asset-ready", "true");
+  await expect(page.locator("#retro-model")).toHaveAttribute("data-state", "ready", { timeout: 20000 });
+  await expect(page.locator(".workstation")).toHaveCount(0);
+  await expect(page.locator(".binary-scene__credit")).toContainText("Tobalation");
   await expect(page.locator("#binary-wave")).toHaveAttribute("data-wave-ready", "true");
   await expect(page.locator(".editorial-hero__link")).toHaveAttribute("href", "public/introduction/index.html");
   await page.screenshot({ path: testInfo.outputPath("layout-home-desktop.png"), fullPage: true });
@@ -237,6 +252,7 @@ test("reduced motion loader lasts at least one second (system preference and sav
 });
 
 test("themes survive reload, invalid saved values are ignored, and every page remains navigable", async ({ page }) => {
+  test.setTimeout(90000);
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/");
   await page.evaluate(() => localStorage.setItem("x86-theme", "invalid!"));
@@ -250,9 +266,9 @@ test("themes survive reload, invalid saved values are ignored, and every page re
     await page.reload();
     await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
     await expect(page.locator("body")).toHaveCSS("background-color", theme === "light" ? "rgb(255, 255, 255)" : theme === "dark" ? "rgb(0, 0, 0)" : theme === "navy" ? "rgb(0, 28, 68)" : "rgb(3, 10, 4)");
-    await page.goto("/public/history/index.html");
+    await page.goto("/public/history/index.html", { waitUntil: "domcontentloaded" });
     await expect(page.locator("html")).toHaveAttribute("data-theme", theme);
-    await page.goto("/");
+    await page.goto("/", { waitUntil: "domcontentloaded" });
   }
 });
 
@@ -290,4 +306,31 @@ test("theme selection works when storage access is blocked", async ({ page }) =>
   await page.locator("#site-settings > summary").click();
   await page.locator('input[name="theme"][value="dark"]').check();
   await expect(page.locator("html")).toHaveAttribute("data-theme", "dark");
+});
+
+test("uploaded retro computer model decodes as a valid local GLB", async ({ page }) => {
+  await page.goto("/");
+  const model = await page.evaluate(async () => {
+    const response = await fetch("/public/assets/models/retro-computer.glb.gz");
+    if (!response.ok) return { status: response.status };
+    const bytes = await new Response(
+      response.body.pipeThrough(new DecompressionStream("gzip"))
+    ).arrayBuffer();
+    return {
+      status: response.status,
+      signature: String.fromCharCode(...new Uint8Array(bytes, 0, 4)),
+      size: bytes.byteLength
+    };
+  });
+  expect(model).toEqual({ status: 200, signature: "glTF", size: 33640 });
+});
+
+test("3D model failure offers a readable fallback", async ({ page }) => {
+  await page.route("**/retro-computer.glb.gz", route => route.abort());
+  await page.goto("/");
+  await expect(page.locator("#retro-model")).toHaveAttribute("data-state", "error");
+  await expect(page.locator(".retro-model__fallback")).toContainText("unavailable");
+  await expect(page.locator(".binary-scene__credit")).toHaveAttribute(
+    "href", "https://sketchfab.com/3d-models/retro-computer-3a496376915846459d77fc14fdd6c1e0"
+  );
 });

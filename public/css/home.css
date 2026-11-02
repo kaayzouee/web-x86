@@ -216,186 +216,43 @@ html.home-page .home-main {
   letter-spacing: .025em;
 }
 
-.workstation {
+.retro-model {
   position: absolute;
   z-index: 2;
   left: 50%;
-  bottom: clamp(56px, 6vw, 82px);
-  width: min(60vw, 610px);
-  height: clamp(210px, 26vw, 330px);
+  bottom: clamp(18px, 3vw, 40px);
+  width: min(78vw, 850px);
+  height: 86%;
   transform: translateX(-50%);
-  filter: drop-shadow(10px 12px 0 var(--home-shadow));
 }
-.workstation__monitor {
-  position: absolute;
-  z-index: 2;
-  left: 11%;
-  bottom: 27%;
-  width: 62%;
-  height: 65%;
-  padding: clamp(6px, .9vw, 12px);
-  border: clamp(5px, .7vw, 9px) solid var(--home-blue);
-  border-bottom-width: clamp(16px, 2vw, 26px);
-  border-radius: 3px;
-  background: var(--home-deep);
-}
-.workstation__monitor::before,
-.workstation__tower::before {
-  content: "";
-  position: absolute;
-  left: -8px;
-  right: -20px;
-  top: -23px;
-  height: 23px;
-  background: var(--home-foam);
-  clip-path: polygon(0 100%, 16px 0, 100% 0, calc(100% - 16px) 100%);
-}
-.workstation__monitor::after,
-.workstation__tower::after {
-  content: "";
-  position: absolute;
-  top: -16px;
-  right: -21px;
-  bottom: -15px;
-  width: 21px;
-  background: var(--home-wave);
-  clip-path: polygon(0 16px, 100% 0, 100% calc(100% - 16px), 0 100%);
-}
-.workstation__screen {
-  position: relative;
+.retro-model model-viewer {
+  display: block;
   width: 100%;
   height: 100%;
-  overflow: hidden;
-  border: 2px solid var(--home-wave);
-  background: var(--home-pale);
-  color: var(--home-blue);
+  background: transparent;
+  --poster-color: transparent;
 }
-.workstation__screen::before,
-.workstation__screen::after {
-  content: "";
+.retro-model__fallback {
   position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: repeating-linear-gradient(0deg, transparent 0 15px, var(--home-foam) 16px 17px);
-  opacity: .4;
-}
-.workstation__screen::after {
-  background: linear-gradient(126deg, transparent 0 62%, var(--home-foam) 63% 74%, transparent 75%);
-}
-.workstation__screen-mark {
-  position: absolute;
-  z-index: 1;
-  top: 23%;
   left: 50%;
-  transform: translateX(-50%);
-  font-size: clamp(26px, 5.2vw, 72px);
-  font-weight: 850;
-  line-height: 1;
-  letter-spacing: -.05em;
-  white-space: nowrap;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  color: var(--home-deep);
+  font: 600 13px/1.5 ui-monospace, monospace;
+  text-align: center;
 }
-.workstation__screen-digits {
-  position: absolute;
-  z-index: 1;
-  bottom: clamp(5px, 1.2vw, 14px);
-  left: clamp(7px, 1.5vw, 20px);
-  font: 700 clamp(6px, .9vw, 12px)/1.6 ui-monospace, SFMono-Regular, Consolas, monospace;
-  letter-spacing: .12em;
-  color: var(--home-muted);
-  white-space: nowrap;
-}
-.workstation__chin {
-  position: absolute;
-  left: 4px;
-  right: 4px;
-  bottom: -16px;
-  display: flex;
-  justify-content: space-between;
-}
-.workstation__chin span:first-child { width: 36%; height: 3px; background: var(--home-foam); }
-.workstation__chin span:last-child { width: 6px; height: 6px; border-radius: 50%; background: var(--home-wave); }
-.workstation__neck {
-  position: absolute;
-  left: 39%;
-  bottom: 18%;
-  width: 8%;
-  height: 10%;
-  background: var(--home-deep);
-}
-.workstation__foot {
-  position: absolute;
-  left: 31%;
-  bottom: 16%;
-  width: 25%;
-  height: 3%;
-  background: var(--home-deep);
-}
-.workstation__tower {
-  position: absolute;
-  z-index: 1;
-  right: 5%;
-  bottom: 22%;
-  width: 18%;
-  height: 57%;
-  border: clamp(5px, .7vw, 9px) solid var(--home-deep);
-  background: var(--home-foam);
-}
-.workstation__drive {
+.retro-model[data-state="ready"] .retro-model__fallback { display: none; }
+.binary-scene__credit {
   display: block;
-  width: 67%;
-  height: 5%;
-  margin: 26% auto 0;
-  background: var(--home-deep);
+  max-width: 1430px;
+  margin: 0 auto;
+  padding: 8px clamp(24px, 5.8vw, 82px) 14px;
+  font-size: 11px;
+  color: var(--home-muted);
+  text-align: right;
 }
-.workstation__drive--short { width: 46%; margin-top: 12%; }
-.workstation__power {
-  position: absolute;
-  right: 17%;
-  bottom: 10%;
-  width: 12px;
-  height: 12px;
-  border: 3px solid var(--home-deep);
-  border-radius: 50%;
-}
-.workstation__desk {
-  position: absolute;
-  z-index: 3;
-  left: 1%;
-  bottom: 14%;
-  width: 98%;
-  height: 5%;
-  background: var(--home-deep);
-  box-shadow: 0 7px 0 var(--home-wave);
-}
-.workstation__desk::before {
-  content: "";
-  position: absolute;
-  bottom: 100%;
-  width: 100%;
-  height: 10px;
-  background: var(--home-foam);
-  clip-path: polygon(2% 100%, 5% 0, 100% 0, 98% 100%);
-}
-.workstation__keyboard {
-  position: absolute;
-  z-index: 4;
-  left: 28%;
-  bottom: 18.5%;
-  width: 29%;
-  height: 5%;
-  transform: skew(-22deg);
-  border: 2px solid var(--home-deep);
-  background: repeating-linear-gradient(90deg, var(--home-deep) 0 7px, var(--home-wave) 7px 10px);
-}
-.workstation__leg {
-  position: absolute;
-  bottom: -5%;
-  width: 3%;
-  height: 20%;
-  background: var(--home-deep);
-}
-.workstation__leg--left { left: 8%; }
-.workstation__leg--right { right: 9%; }
+.binary-scene__credit:hover { color: var(--home-blue); }
 
 html.home-page .home-footer {
   background: var(--home-bg) !important;
@@ -433,7 +290,7 @@ html.home-page .home-footer {
   .editorial-hero__link { margin-top: 20px; }
   .binary-scene { height: 430px; margin-top: 40px; }
   .binary-scene__label { left: 22px; right: 22px; font-size: 9px; }
-  .workstation { width: min(84vw, 425px); height: 255px; bottom: 68px; }
+  .retro-model { width: min(100vw, 540px); height: 81%; bottom: 40px; }
   .binary-scene__note { font-size: 9px; right: 20px; }
   .home-footer__inner { flex-wrap: wrap; gap: 18px; padding: 24px 22px; }
 }
@@ -444,16 +301,14 @@ html.home-page .home-footer {
   .hero-editorial__copy p { font-size: 10px; }
   .editorial-hero__wordmark { font-size: 52px; }
   .binary-scene__label span { display: none; }
-  .workstation { width: 86vw; }
+  .retro-model { width: 100%; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .binary-scene__canvas, .workstation { animation: none !important; }
+  .binary-scene__canvas { animation: none !important; }
 }
-html.reduce-motion .binary-scene__canvas,
-html.reduce-motion .workstation { animation: none !important; }
+html.reduce-motion .binary-scene__canvas { animation: none !important; }
 
 .binary-scene { border-bottom: 1px solid var(--home-wave); }
 @media (max-width: 700px) {
   .binary-scene__label { top: 14px; }
-  .workstation__tower { right: 3%; }
 }
