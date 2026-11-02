@@ -67,6 +67,7 @@ test("reduced motion skips handwriting without blocking the homepage", async ({ 
 });
 
 test("editorial home keeps navigation, large x86 stamp, and no CRT terminal", async ({ page }, testInfo) => {
+  test.setTimeout(45000);
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto("/?lang=en", { waitUntil: "domcontentloaded" });
@@ -79,6 +80,7 @@ test("editorial home keeps navigation, large x86 stamp, and no CRT terminal", as
   await expect(page.locator(".crt-terminal, #crt-toggle, #crt-source")).toHaveCount(0);
   await expect(page.locator("#retro-model")).toBeVisible();
   await expect(page.locator("#retro-computer")).toHaveAttribute("data-asset-ready", "true");
+  await expect(page.locator("#retro-model")).toHaveAttribute("data-state", "ready", { timeout: 20000 });
   await expect(page.locator(".workstation")).toHaveCount(0);
   await expect(page.locator(".binary-scene__credit")).toContainText("Tobalation");
   await expect(page.locator("#binary-wave")).toHaveAttribute("data-wave-ready", "true");
