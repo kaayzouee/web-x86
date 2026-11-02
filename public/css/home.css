@@ -83,6 +83,7 @@ html.home-page .home-main {
   place-items: center;
   width: min(100%, 430px);
   aspect-ratio: 1;
+  align-self: start;
   background: var(--home-blue);
   color: var(--home-bg);
   overflow: hidden;
@@ -149,7 +150,7 @@ html.home-page .home-main {
 }
 .editorial-hero__wordmark {
   margin: clamp(16px, 2vw, 34px) 0 10px;
-  font-size: clamp(66px, 12.25vw, 198px);
+  font-size: clamp(80px, 14.7vw, 212px);
   font-weight: 800;
   line-height: .9;
   letter-spacing: -.09em;
@@ -184,8 +185,8 @@ html.home-page .home-main {
   position: relative;
   isolation: isolate;
   width: 100%;
-  height: clamp(400px, 43vw, 630px);
-  margin-top: clamp(52px, 8.3vw, 132px);
+  height: clamp(380px, 40vw, 590px);
+  margin-top: clamp(20px, 4vw, 60px);
   overflow: hidden;
   background: var(--home-bg);
 }
@@ -219,10 +220,10 @@ html.home-page .home-main {
   position: absolute;
   z-index: 2;
   left: 50%;
-  bottom: 20px;
+  bottom: clamp(56px, 6vw, 82px);
   transform: translateX(-50%);
-  width: min(66vw, 670px);
-  height: clamp(210px, 28vw, 340px);
+  width: min(60vw, 610px);
+  height: clamp(210px, 26vw, 330px);
   filter: drop-shadow(0 8px 0 var(--home-shadow));
 }
 .workstation__monitor {
@@ -362,12 +363,12 @@ html.home-page .home-footer {
   .hero-editorial__heading h2 { font-size: clamp(27px, 5vw, 45px); }
   .hero-expand { width: clamp(27px, 5.5vw, 48px); stroke-width: 7; }
   .hero-editorial__copy p { font-size: clamp(10px, 1.9vw, 13px); line-height: 1.22; margin-top: 10px; }
-  .editorial-hero__wordmark { font-size: clamp(56px, 12.2vw, 86px); margin-top: 17px; }
+  .editorial-hero__wordmark { font-size: clamp(63px, 13.9vw, 100px); margin-top: 17px; }
   .editorial-hero__captions { font-size: clamp(10px, 2vw, 14px); gap: 9px; }
   .editorial-hero__link { margin-top: 20px; }
-  .binary-scene { height: 440px; margin-top: 56px; }
+  .binary-scene { height: 430px; margin-top: 40px; }
   .binary-scene__label { left: 22px; right: 22px; font-size: 9px; }
-  .workstation { width: min(92vw, 470px); height: 270px; bottom: 27px; }
+  .workstation { width: min(84vw, 425px); height: 255px; bottom: 68px; }
   .workstation__screen-mark { font-size: clamp(36px, 9vw, 67px); }
   .binary-scene__note { font-size: 9px; right: 20px; }
   .home-footer__inner { flex-wrap: wrap; gap: 18px; padding: 24px 22px; }
@@ -378,12 +379,23 @@ html.home-page .home-footer {
   .hero-stamp { font-size: 65px; }
   .hero-editorial__heading h2 { font-size: 25px; }
   .hero-editorial__copy p { font-size: 10px; }
-  .editorial-hero__wordmark { font-size: 12vw; }
+  .editorial-hero__wordmark { font-size: 52px; }
   .binary-scene__label span { display: none; }
-  .workstation { width: 95vw; }
+  .workstation { width: 86vw; }
 }
 @media (prefers-reduced-motion: reduce) {
   .binary-scene__canvas, .workstation { animation: none !important; }
 }
 html.reduce-motion .binary-scene__canvas,
 html.reduce-motion .workstation { animation: none !important; }
+
+/* Give the wave a breathable shoreline, with room beneath the desk and no
+   text overlay on the foreground digits. */
+.binary-scene { border-bottom: 1px solid var(--home-wave); }
+.workstation__monitor { box-shadow: 8px -7px 0 var(--home-shadow); }
+.workstation__screen { background-color: var(--home-pale); }
+.workstation__desk { box-shadow: 0 7px 0 var(--home-wave); }
+@media (max-width: 700px) {
+  .binary-scene__label { top: 14px; }
+  .workstation__tower { right: 3%; }
+}
