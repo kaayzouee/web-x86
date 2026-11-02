@@ -162,16 +162,34 @@ test("theme labels and high contrast palette are applied", async ({ page }) => {
 });
 
 test("reduced motion loader lasts at least one second (system preference and saved setting)", async ({ page }) => {
+  // Record DOM removal from an init script: navigation can finish after the
+  // loader has disappeared, especially when remote collage images finish late.
+  await page.addInitScript(() => {
+    window.__loaderObservedAt = performance.now();
+    window.__loaderRemovedAt = null;
+    const observer = new MutationObserver((records) => {
+      for (const record of records) {
+        for (const node of record.removedNodes) {
+          if (node.nodeType === 1 && (node.id === "loader" || node.querySelector?.("#loader"))) {
+            window.__loaderRemovedAt = performance.now();
+            observer.disconnect();
+            return;
+          }
+        }
+      }
+    });
+    observer.observe(document, { childList: true, subtree: true });
+  });
   for (const saved of [false, true]) {
-    if (saved) await page.addInitScript(() => localStorage.setItem("x86-reduced-motion", "true"));
     await page.emulateMedia({ reducedMotion: saved ? "no-preference" : "reduce" });
-    const start = Date.now();
     await page.goto("/?lang=en", { waitUntil: "domcontentloaded" });
-    await expect(page.locator("#loader")).toBeVisible();
-    await page.waitForTimeout(400);
-    await expect(page.locator("#loader")).toBeVisible();
-    await expect(page.locator("#loader")).toHaveCount(0, { timeout: 6000 });
-    expect(Date.now() - start).toBeGreaterThanOrEqual(950);
+    if (saved) {
+      await page.evaluate(() => localStorage.setItem("x86-reduced-motion", "true"));
+      await page.reload({ waitUntil: "domcontentloaded" });
+    }
+    await expect.poll(() => page.evaluate(() => window.__loaderRemovedAt), { timeout: 6000 }).not.toBeNull();
+    const lifetime = await page.evaluate(() => window.__loaderRemovedAt - window.__loaderObservedAt);
+    expect(lifetime).toBeGreaterThanOrEqual(950);
   }
 });
 
