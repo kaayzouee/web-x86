@@ -9,7 +9,7 @@
   <script>document.documentElement.classList.add("js");</script>
   <link rel="stylesheet" href="public/css/main.css?v=5">
   <link rel="stylesheet" href="public/css/loading.css?v=4">
-  <link rel="stylesheet" href="public/css/home.css?v=5">
+  <link rel="stylesheet" href="public/css/home.css?v=6">
   <script src="public/js/loading.js?v=7" defer></script>
   <script src="public/js/main.js?v=4" defer></script>
   <script src="public/js/home-wave.js?v=2" defer></script>
@@ -122,23 +122,23 @@
         </div>
         <div class="hero-meta">
           <span>X86<br>FIELD GUIDE<br>01 / PRESENT</span>
-          <div class="hero-palette" aria-hidden="true"><i></i><i></i><i></i></div>
+          <div class="hero-evolution" aria-label="x86: 16-bit, 32-bit, 64-bit"><span>16-BIT</span><span>32-BIT</span><span>64-BIT</span></div>
         </div>
       </div>
       <div class="editorial-hero__intro">
         <div class="editorial-hero__lead">
-          <p class="editorial-hero__eyebrow">THE ARCHITECTURE BEHIND MODERN COMPUTING</p>
+          <p class="editorial-hero__eyebrow">THE ARCHITECTURE BEHIND THE PC</p>
           <h1 id="home-title" class="editorial-hero__wordmark">Inside x86<span>.</span></h1>
-          <p class="editorial-hero__description">From the Intel 8086 to modern processors, follow the history, registers and instructions that shaped personal computing.</p>
-          <a class="editorial-hero__link" href="public/introduction/index.html">Explore the field guide <span aria-hidden="true">↗</span></a>
+          <p class="editorial-hero__description">The Intel 8086 introduced x86 in 1978. This field guide traces its evolution through the instructions, registers, and architecture that followed.</p>
+          <a class="editorial-hero__link" href="public/introduction/index.html">Explore the field guide <span aria-hidden="true">→</span></a>
         </div>
         <nav class="home-explore" id="home-explore" aria-label="Explore">
-          <p class="home-explore__title">Explore <span aria-hidden="true">↗</span></p>
-          <a href="public/introduction/index.html"><span>01</span> Overview <span aria-hidden="true">↗</span></a>
-          <a href="public/history/index.html"><span>02</span> History <span aria-hidden="true">↗</span></a>
-          <a href="public/architecture/index.html"><span>03</span> Architecture <span aria-hidden="true">↗</span></a>
-          <a href="public/instructions/index.html"><span>04</span> Instructions <span aria-hidden="true">↗</span></a>
-          <a href="public/comparison/index.html"><span>05</span> Comparison <span aria-hidden="true">↗</span></a>
+          <p class="home-explore__title">Explore <span aria-hidden="true">01–05</span></p>
+          <a href="public/introduction/index.html"><span>01</span> Overview <span aria-hidden="true">→</span></a>
+          <a href="public/history/index.html"><span>02</span> History <span aria-hidden="true">→</span></a>
+          <a href="public/architecture/index.html"><span>03</span> Architecture <span aria-hidden="true">→</span></a>
+          <a href="public/instructions/index.html"><span>04</span> Instructions <span aria-hidden="true">→</span></a>
+          <a href="public/comparison/index.html"><span>05</span> Comparison <span aria-hidden="true">→</span></a>
         </nav>
       </div>
     </section>
@@ -149,28 +149,37 @@
           <p class="home-paths__eyebrow">A MAP OF THE FIELD GUIDE / 02</p>
           <h2 id="home-paths-title">Choose a starting point.</h2>
         </div>
-        <p>New to x86? Start with its origins. Already familiar? Jump straight into the instruction set or processor registers.</p>
+        <p>New to x86? Begin with the 8086. If you know the basics, head straight to the instruction set or processor registers.</p>
       </div>
       <div class="home-paths__grid">
         <a class="home-path" href="public/history/index.html">
           <span class="home-path__number">01 / HISTORY</span>
           <strong>Meet the 8086</strong>
-          <span>The processor that started the x86 story.</span>
-          <span class="home-path__arrow" aria-hidden="true">↗</span>
+          <span>Released in 1978, the 8086 introduced the 16-bit instruction set that began the x86 family.</span>
+          <span class="home-path__spec">1978 / INTEL 8086</span>
+          <span class="home-path__arrow" aria-hidden="true">→</span>
         </a>
         <a class="home-path" href="public/instructions/basic-instructions.html">
           <span class="home-path__number">02 / INSTRUCTIONS</span>
           <strong>Instruction set</strong>
-          <span>Learn MOV, ADD, jumps and the building blocks.</span>
-          <span class="home-path__arrow" aria-hidden="true">↗</span>
+          <span>MOV, ADD, JMP. Learn how x86 instructions move data, perform arithmetic, and control execution.</span>
+          <span class="home-path__spec">MOV · ADD · JMP</span>
+          <span class="home-path__arrow" aria-hidden="true">→</span>
         </a>
         <a class="home-path" href="public/architecture/registers.html">
           <span class="home-path__number">03 / ARCHITECTURE</span>
           <strong>Registers</strong>
-          <span>Understand the CPU's fastest working storage.</span>
-          <span class="home-path__arrow" aria-hidden="true">↗</span>
+          <span>From AX to RAX, see how x86 registers changed as the architecture grew from 16 to 64 bits.</span>
+          <span class="home-path__spec">AX → EAX → RAX</span>
+          <span class="home-path__arrow" aria-hidden="true">→</span>
         </a>
       </div>
+      <aside class="home-example" aria-label="A 16-bit x86 instruction example">
+        <p>IN PRACTICE / 16-BIT X86</p>
+        <pre><code>mov ax, 5
+add ax, 3</code></pre>
+        <samp>AX = 0008h</samp>
+      </aside>
     </section>
 
     <section class="binary-scene" aria-labelledby="binary-scene-title">
