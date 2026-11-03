@@ -352,11 +352,13 @@ test("Explore reveal follows typing and remains accessible without animation", a
   test.setTimeout(35000);
   await page.addInitScript(() => {
     window.__revealTimings = { loaderGone: null, exploreVisible: null };
+    let loaderSeen = false;
     const observer = new MutationObserver(() => {
       const times = window.__revealTimings;
       const loader = document.getElementById("loader");
       const explore = document.getElementById("home-explore");
-      if (times.loaderGone === null && !loader) times.loaderGone = performance.now();
+      if (loader) loaderSeen = true;
+      if (times.loaderGone === null && loaderSeen && !loader) times.loaderGone = performance.now();
       if (times.exploreVisible === null && explore?.classList.contains("is-visible")) {
         times.exploreVisible = performance.now();
       }
@@ -369,6 +371,7 @@ test("Explore reveal follows typing and remains accessible without animation", a
   await expect(page.locator("#home-explore")).toBeVisible({ timeout: 6500 });
   await expect(page.locator("#hero-typed")).toHaveText("x86");
   const timing = await page.evaluate(() => window.__revealTimings);
+  expect(timing.loaderGone).not.toBeNull();
   expect(timing.exploreVisible - timing.loaderGone).toBeGreaterThanOrEqual(2800);
   expect(timing.exploreVisible - timing.loaderGone).toBeLessThan(4500);
   await expect(page.locator("#site-menu > summary")).toBeVisible();
