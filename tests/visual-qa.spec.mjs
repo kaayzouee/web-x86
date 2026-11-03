@@ -45,6 +45,7 @@ test("painted homepage has no cropped headings or illustration/footer collisions
 
   for (const viewport of viewports) {
     await page.setViewportSize(viewport);
+    await page.evaluate(() => scrollTo(0, 0));
     await expect.poll(() => page.evaluate(() => (
       document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1
     ))).toBe(true);
