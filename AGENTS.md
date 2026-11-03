@@ -5,7 +5,7 @@ This repository is a static educational x86 website. **A green Playwright job do
 ## Source of truth and project invariants
 
 - The original editorial visual reference is a white canvas with strong cobalt-blue shapes, tight oversized typography, sparse annotation, three small swatches, and a bottom illustration that occupies the width without clutter.
-- Translate that layout to x86 terminology. Keep the oversized **X86** square, the strong **Inside x86.** wordmark, and the existing navigation and settings hamburger. Do not silently remove navigation, theme controls, or accessibility semantics.
+- Translate that layout to x86 terminology. Keep **Inside x86.** as the primary H1, the small typed `_x86` motif, the timed Explore links, topic-card navigation, and the existing header/settings hamburger. Do not silently remove navigation, theme controls, or accessibility semantics.
 - The bottom artwork is a workstation in front of an ocean-like, pixelated **0/1** wave. Distant digits are smaller/fainter; near digits are larger/more saturated. The binary surf must have recognizable crest, foam, depth and negative space, rather than a uniform random text carpet. Digits can change periodically but must not flicker every frame.
 - Do not restore the old CRT terminal or use image generation for the workstation or wave.
 - Maintain the themes Default (`light`), High Contrast (`dark`), Navy, and Hacked; preserve persisted theme IDs. High Contrast palette: `#000000`, `#1E1E2F`, `#FF4500`, `#F8F8FF`, `#FFEA00`, `#00CED1`, `#8A2BE2`.
@@ -31,7 +31,7 @@ Use tools that actually exist in the environment: Playwright + Chromium and GitH
 
 ## Frontend implementation details
 
-- Homepage: `index.html`, `public/css/home.css`, `public/js/home-wave.js`. Shared theme/menu behavior: `public/css/main.css`, `public/js/main.js`. Loader: `public/css/loading.css`, `public/js/loading.js`.
+- Homepage: `index.html`, `public/css/home.css`, `public/js/home-hero.js`, `public/js/home-wave.js`. Shared theme/menu behavior: `public/css/main.css`, `public/js/main.js`. Loader: `public/css/loading.css`, `public/js/loading.js`.
 - Keep decorative canvas out of tab navigation; provide succinct text alternative via `aria-label` or a visually-hidden description. Text links and settings should remain keyboard accessible with visible focus indicators.
 - Prefer CSS variables and theme-specific tokens to hardcoded colors. Verify contrast visually and through computed colors. Keep a fallback for unavailable canvas and respect mobile CPU/power: throttle binary updates, pause when the tab is hidden, do not allocate huge glyph arrays on every frame.
 - If the request says to match a reference, prioritize its **proportions and negative space**, not merely its colors. Preserve clear separation between illustration, captions and footer.
