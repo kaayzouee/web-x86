@@ -210,7 +210,7 @@ html.home-page .home-main {
   letter-spacing: -.055em;
 }
 .home-paths__heading > p {
-  max-width: 390px;
+  max-width: 350px;
   margin: 0;
   font-size: 15px;
   line-height: 1.5;
@@ -394,8 +394,8 @@ html.home-page .home-footer {
 @media (max-width: 380px) {
   .editorial-hero, .home-paths { padding-inline: 16px; }
   .hero-prompt { font-size: 45px; }
-  .hero-meta { font-size: 9px; }
-  .hero-evolution { font-size: 9px; }
+  .hero-meta { font-size: 10px; }
+  .hero-evolution { font-size: 11px; }
   .editorial-hero__wordmark { font-size: 12vw; }
   .binary-scene__label span { display: none; }
   .retro-model { width: 100%; }
