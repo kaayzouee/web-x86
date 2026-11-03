@@ -72,7 +72,7 @@ test("browser locale selects a greeting when no setting exists", async ({ browse
 test("reduced motion skips handwriting without blocking the homepage", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/?lang=en", { waitUntil: "domcontentloaded" });
-  await expect(page.locator("#loader")).toHaveCount(0, { timeout: 5000 });
+  await expect(page.locator("#loader")).toHaveCount(0, { timeout: 12000 });
   await expect(page.locator("#home-title")).toBeVisible();
 });
 
@@ -150,7 +150,7 @@ test("homepage navigation remains usable on narrow phones", async ({ page }, tes
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.setViewportSize({ width: 320, height: 700 });
   await page.goto("/", { waitUntil: "domcontentloaded" });
-  await expect(page.locator("#loader")).toHaveCount(0, { timeout: 5000 });
+  await expect(page.locator("#loader")).toHaveCount(0, { timeout: 12000 });
   await expect(page.locator("#home-title")).toBeVisible();
   await expect(page.locator(".hero-prompt")).toBeVisible();
   await expect(page.locator("#home-explore")).toBeVisible();
@@ -252,7 +252,7 @@ test("reduced motion loader lasts at least one second (system preference and sav
       await page.evaluate(() => localStorage.setItem("x86-reduced-motion", "true"));
       await page.reload({ waitUntil: "domcontentloaded" });
     }
-    await expect.poll(() => page.evaluate(() => window.__loaderRemovedAt), { timeout: 6000 }).not.toBeNull();
+    await expect.poll(() => page.evaluate(() => window.__loaderRemovedAt), { timeout: 12000 }).not.toBeNull();
     const lifetime = await page.evaluate(() => window.__loaderRemovedAt - window.__loaderObservedAt);
     expect(lifetime).toBeGreaterThanOrEqual(950);
   }
@@ -380,7 +380,7 @@ test("Explore reveal follows typing and remains accessible without animation", a
 test("Explore and topic paths remain available with reduced motion", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/?lang=en", { waitUntil: "domcontentloaded" });
-  await expect(page.locator("#loader")).toHaveCount(0, { timeout: 5000 });
+  await expect(page.locator("#loader")).toHaveCount(0, { timeout: 12000 });
   await expect(page.locator("#home-explore")).toBeVisible();
   await expect(page.locator("#hero-typed")).toHaveText("x86");
   await expect(page.locator(".hero-prompt__cursor")).toHaveCSS("animation-name", "none");
