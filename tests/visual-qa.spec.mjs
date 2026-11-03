@@ -111,6 +111,10 @@ test("painted homepage has no cropped headings or illustration/footer collisions
     measurements.push({ viewport: viewport.label, width: viewport.width, height: viewport.height, header, prompt, explore, title, paths, scene, station, footer, sceneLabel: label, drawn });
     await page.locator("#retro-computer").scrollIntoViewIfNeeded();
     await page.waitForTimeout(300);
+    await page.locator(".binary-scene").screenshot({
+      path: testInfo.outputPath("layout-3d-" + viewport.label + ".png")
+    });
+    await page.evaluate(() => scrollTo(0, 0));
     await page.screenshot({
       path: testInfo.outputPath("layout-qa-" + viewport.label + ".png"),
       fullPage: true,
@@ -159,6 +163,10 @@ test("each theme paints a legible homepage while preserving the binary artwork",
     expect(colors.text).not.toBe(colors.paper);
     await page.locator("#retro-computer").scrollIntoViewIfNeeded();
     await page.waitForTimeout(300);
+    await page.locator(".binary-scene").screenshot({
+      path: testInfo.outputPath("layout-3d-theme-" + theme + ".png")
+    });
+    await page.evaluate(() => scrollTo(0, 0));
     await page.screenshot({
       path: testInfo.outputPath("layout-qa-theme-" + theme + ".png"),
       fullPage: true,
