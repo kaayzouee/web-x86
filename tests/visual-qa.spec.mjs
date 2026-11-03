@@ -147,7 +147,7 @@ test("each theme paints a legible homepage while preserving the binary artwork",
     await expect(page.locator("#retro-model")).toHaveAttribute("data-state", "ready", { timeout: 20000 });
 
     const colors = await page.evaluate(() => {
-      const paragraph = document.querySelector(".hero-editorial__copy p");
+      const paragraph = document.querySelector(".editorial-hero__description");
       return {
         text: getComputedStyle(paragraph).color,
         paper: getComputedStyle(document.body).backgroundColor
