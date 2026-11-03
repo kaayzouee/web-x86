@@ -44,3 +44,14 @@ The captured visual audit reported **zero** browser page errors, console errors,
 - Browser audit: no console errors, page errors, request failures, or HTTP errors.
 - Regression checks: badge/text bounds, visible workstation depth, readable screen contents and center binary coverage.
 - GitHub Actions: https://github.com/kaayzouee/web-x86/actions/runs/41471541673 — passed.
+
+## Homepage navigation redesign — 2026-11-03
+
+- Replaced the oversized decorative X86 block with a typed `_x86` motif and the **Inside x86.** H1.
+- Added a dedicated Explore list that appears three seconds after loading. Reduced-motion users see it immediately, and navigation remains visible without JavaScript.
+- Made the field-guide CTA a prominent green action with dark text, and added direct topic entries for the 8086, basic instructions and registers.
+- Preserved the header hamburger, all four themes, and the existing binary scene and 3D model.
+- Checked Chromium screenshots at 320×700 and 736×920: title, topic cards and links are legible and do not overflow horizontally. Automated geometry checks cover 390×844, 1280×900 and 1440×900 as well.
+- The browser audit reported no page errors, console errors, network failures or HTTP errors on the inspected run.
+- A model-viewer full-page capture can omit its WebGL scene when offscreen; screenshots now scroll the 3D model into view before capture.
+- Regression coverage includes the delayed Explore appearance, reduced motion, no-JavaScript availability, and destination URLs.

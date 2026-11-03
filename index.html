@@ -9,10 +9,11 @@
   <script>document.documentElement.classList.add("js");</script>
   <link rel="stylesheet" href="public/css/main.css?v=5">
   <link rel="stylesheet" href="public/css/loading.css?v=4">
-  <link rel="stylesheet" href="public/css/home.css?v=4">
+  <link rel="stylesheet" href="public/css/home.css?v=5">
   <script src="public/js/loading.js?v=7" defer></script>
   <script src="public/js/main.js?v=4" defer></script>
   <script src="public/js/home-wave.js?v=2" defer></script>
+  <script src="public/js/home-hero.js?v=1" defer></script>
   <script src="public/js/retro-model.js?v=3" defer></script>
 </head>
 <body>
@@ -115,35 +116,61 @@
   </header>
   <main class="home-main">
     <section class="editorial-hero" aria-labelledby="home-title">
-      <div class="editorial-hero__grid">
-        <div class="hero-stamp" aria-label="X86">
-          <span class="hero-stamp__logo" aria-hidden="true">X86</span>
+      <div class="editorial-hero__topline">
+        <div class="hero-prompt" aria-label="_x86">
+          <span class="hero-prompt__cursor" aria-hidden="true">_</span><span id="hero-typed" aria-hidden="true">x86</span>
         </div>
-        <div class="hero-editorial">
-          <div class="hero-editorial__topline">
-            <span class="hero-editorial__edition">X86<br>FIELD<br>GUIDE</span>
-            <div class="hero-palette" aria-hidden="true">
-              <i></i><i></i><i></i>
-            </div>
-          </div>
-          <div class="hero-editorial__copy">
-            <div class="hero-editorial__heading">
-              <h2>Digital.<br>Origins.</h2>
-              <svg class="hero-expand" viewBox="0 0 96 96" aria-hidden="true">
-                <path d="M10 10H36M10 10V36M10 10L86 86M60 86H86V60M86 10H60M86 10V36M86 10L10 86M10 60V86H36" />
-              </svg>
-            </div>
-            <p>From the first 8086 to the processors of today. Explore the instruction set, its evolution, and the architecture inside modern computing.</p>
-          </div>
+        <div class="hero-meta">
+          <span>X86<br>FIELD GUIDE<br>01 / PRESENT</span>
+          <div class="hero-palette" aria-hidden="true"><i></i><i></i><i></i></div>
         </div>
       </div>
-      <h1 id="home-title" class="editorial-hero__wordmark">Inside x86<span>.</span></h1>
-      <div class="editorial-hero__captions">
-        <span>The Origins</span>
-        <span>Of Modern</span>
-        <span>Computing</span>
+      <div class="editorial-hero__intro">
+        <div class="editorial-hero__lead">
+          <p class="editorial-hero__eyebrow">THE ARCHITECTURE BEHIND MODERN COMPUTING</p>
+          <h1 id="home-title" class="editorial-hero__wordmark">Inside x86<span>.</span></h1>
+          <p class="editorial-hero__description">From the Intel 8086 to modern processors, follow the history, registers and instructions that shaped personal computing.</p>
+          <a class="editorial-hero__link" href="public/introduction/index.html">Explore the field guide <span aria-hidden="true">↗</span></a>
+        </div>
+        <nav class="home-explore" id="home-explore" aria-label="Explore">
+          <p class="home-explore__title">Explore <span aria-hidden="true">↗</span></p>
+          <a href="public/introduction/index.html"><span>01</span> Overview <span aria-hidden="true">↗</span></a>
+          <a href="public/history/index.html"><span>02</span> History <span aria-hidden="true">↗</span></a>
+          <a href="public/architecture/index.html"><span>03</span> Architecture <span aria-hidden="true">↗</span></a>
+          <a href="public/instructions/index.html"><span>04</span> Instructions <span aria-hidden="true">↗</span></a>
+          <a href="public/comparison/index.html"><span>05</span> Comparison <span aria-hidden="true">↗</span></a>
+        </nav>
       </div>
-      <a class="editorial-hero__link" href="public/introduction/index.html">Explore the field guide <span aria-hidden="true">↗</span></a>
+    </section>
+
+    <section class="home-paths" aria-labelledby="home-paths-title">
+      <div class="home-paths__heading">
+        <div>
+          <p class="home-paths__eyebrow">A MAP OF THE FIELD GUIDE / 02</p>
+          <h2 id="home-paths-title">Choose a starting point.</h2>
+        </div>
+        <p>New to x86? Start with its origins. Already familiar? Jump straight into the instruction set or processor registers.</p>
+      </div>
+      <div class="home-paths__grid">
+        <a class="home-path" href="public/history/index.html">
+          <span class="home-path__number">01 / HISTORY</span>
+          <strong>Meet the 8086</strong>
+          <span>The processor that started the x86 story.</span>
+          <span class="home-path__arrow" aria-hidden="true">↗</span>
+        </a>
+        <a class="home-path" href="public/instructions/basic-instructions.html">
+          <span class="home-path__number">02 / INSTRUCTIONS</span>
+          <strong>Instruction set</strong>
+          <span>Learn MOV, ADD, jumps and the building blocks.</span>
+          <span class="home-path__arrow" aria-hidden="true">↗</span>
+        </a>
+        <a class="home-path" href="public/architecture/registers.html">
+          <span class="home-path__number">03 / ARCHITECTURE</span>
+          <strong>Registers</strong>
+          <span>Understand the CPU's fastest working storage.</span>
+          <span class="home-path__arrow" aria-hidden="true">↗</span>
+        </a>
+      </div>
     </section>
 
     <section class="binary-scene" aria-labelledby="binary-scene-title">

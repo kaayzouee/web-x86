@@ -41,34 +41,39 @@ test("painted homepage has no cropped headings or illustration/footer collisions
   await expect(page.locator("#loader")).toHaveCount(0, { timeout: 8000 });
   await expect(page.locator("#binary-wave")).toHaveAttribute("data-wave-ready", "true");
   await expect(page.locator("#retro-model")).toHaveAttribute("data-state", "ready", { timeout: 20000 });
+  await expect(page.locator("#home-explore")).toBeVisible();
 
   for (const viewport of viewports) {
     await page.setViewportSize(viewport);
+    await page.evaluate(() => scrollTo(0, 0));
     await expect.poll(() => page.evaluate(() => (
       document.documentElement.scrollWidth <= document.documentElement.clientWidth + 1
     ))).toBe(true);
 
     const header = await rect(page.locator(".site-header"));
-    const square = await rect(page.locator(".hero-stamp"));
+    const prompt = await rect(page.locator(".hero-prompt"));
+    const explore = await rect(page.locator("#home-explore"));
+    const paths = await rect(page.locator(".home-paths"));
     const title = await rect(page.locator("#home-title"));
     const scene = await rect(page.locator(".binary-scene"));
     const station = await rect(page.locator(".retro-model"));
     const footer = await rect(page.locator(".home-footer"));
     const label = await rect(page.locator(".binary-scene__label"));
 
-    const logo = await rect(page.locator(".hero-stamp__logo"));
-    expect(logo.x).toBeGreaterThanOrEqual(square.x - 1);
-    expect(logo.x + logo.width).toBeLessThanOrEqual(square.x + square.width + 1);
-    expect(logo.y + logo.height).toBeLessThanOrEqual(square.y + square.height + 1);
-    await expect(page.locator(".hero-stamp__logo")).toHaveText("X86");
-
+    await expect(page.locator(".hero-stamp")).toHaveCount(0);
+    await expect(page.locator("#hero-typed")).toHaveText("x86");
+    await expect(page.locator(".home-path")).toHaveCount(3);
+    await expect(page.locator("#home-explore a")).toHaveCount(5);
     await expect(page.locator(".workstation")).toHaveCount(0);
     await expect(page.locator("#retro-computer")).toHaveAttribute("data-asset-ready", "true");
     await expect(page.locator("#retro-computer")).toHaveAttribute("alt", /retro computer/);
 
-    expect(Math.abs(square.width - square.height)).toBeLessThan(2);
-    expect(square.y).toBeGreaterThanOrEqual(header.y + header.height - 5);
-    expect(title.y).toBeGreaterThanOrEqual(square.y + square.height - 3);
+    expect(prompt.y).toBeGreaterThanOrEqual(header.y + header.height - 5);
+    expect(title.y).toBeGreaterThan(prompt.y + prompt.height + 10);
+    expect(paths.y).toBeGreaterThan(title.y + title.height + 25);
+    expect(scene.y).toBeGreaterThanOrEqual(paths.y + paths.height - 2);
+    expect(explore.x).toBeGreaterThanOrEqual(0);
+    expect(explore.x + explore.width).toBeLessThanOrEqual(viewport.width + 1);
     expect(station.y).toBeGreaterThan(scene.y + 10);
     expect(station.y + station.height).toBeLessThan(scene.y + scene.height - 10);
     expect(label.y + label.height).toBeLessThan(station.y + 5);
@@ -103,7 +108,13 @@ test("painted homepage has no cropped headings or illustration/footer collisions
     });
     expect(centerSurf).toBeGreaterThan(10);
 
-    measurements.push({ viewport: viewport.label, width: viewport.width, height: viewport.height, header, square, title, scene, station, footer, sceneLabel: label, drawn });
+    measurements.push({ viewport: viewport.label, width: viewport.width, height: viewport.height, header, prompt, explore, title, paths, scene, station, footer, sceneLabel: label, drawn });
+    await page.locator("#retro-computer").scrollIntoViewIfNeeded();
+    await page.waitForTimeout(300);
+    await page.locator(".binary-scene").screenshot({
+      path: testInfo.outputPath("layout-3d-" + viewport.label + ".png")
+    });
+    await page.evaluate(() => scrollTo(0, 0));
     await page.screenshot({
       path: testInfo.outputPath("layout-qa-" + viewport.label + ".png"),
       fullPage: true,
@@ -143,13 +154,19 @@ test("each theme paints a legible homepage while preserving the binary artwork",
     await expect(page.locator("#retro-model")).toHaveAttribute("data-state", "ready", { timeout: 20000 });
 
     const colors = await page.evaluate(() => {
-      const paragraph = document.querySelector(".hero-editorial__copy p");
+      const paragraph = document.querySelector(".editorial-hero__description");
       return {
         text: getComputedStyle(paragraph).color,
         paper: getComputedStyle(document.body).backgroundColor
       };
     });
     expect(colors.text).not.toBe(colors.paper);
+    await page.locator("#retro-computer").scrollIntoViewIfNeeded();
+    await page.waitForTimeout(300);
+    await page.locator(".binary-scene").screenshot({
+      path: testInfo.outputPath("layout-3d-theme-" + theme + ".png")
+    });
+    await page.evaluate(() => scrollTo(0, 0));
     await page.screenshot({
       path: testInfo.outputPath("layout-qa-theme-" + theme + ".png"),
       fullPage: true,
