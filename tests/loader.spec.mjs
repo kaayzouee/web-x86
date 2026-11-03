@@ -390,10 +390,10 @@ test("Explore and topic paths remain available with reduced motion", async ({ pa
     "Registers": "/public/architecture/registers.html"
   };
   for (const [title, url] of Object.entries(routeMap)) {
-    const link = page.locator(".home-path", { hasText: title });
+    const link = page.locator(".home-path").filter({ has: page.locator("strong", { hasText: title }) });
     await expect(link).toHaveAttribute("href", url.slice(1));
   }
-  await page.locator(".home-path", { hasText: "Instruction set" }).click();
+  await page.locator(".home-path").filter({ has: page.locator("strong", { hasText: "Instruction set" }) }).click();
   await expect(page).toHaveURL(/\/public\/instructions\/basic-instructions\.html$/);
 });
 
