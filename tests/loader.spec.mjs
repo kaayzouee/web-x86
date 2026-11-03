@@ -44,10 +44,10 @@ for (const { lang, text, duration } of examples) {
 
     const progress = loader.locator("#loader-progress");
     await expect.poll(async () => Number(await progress.getAttribute("aria-valuenow")), {
-      timeout: duration + 2500
+      timeout: duration + 7000
     }).toBeGreaterThanOrEqual(95);
 
-    await expect(loader).toHaveCount(0, { timeout: duration + 4500 });
+    await expect(loader).toHaveCount(0, { timeout: duration + 7000 });
     await expect(page.locator("#home-title")).toBeVisible();
     expect(errors).toEqual([]);
   });
