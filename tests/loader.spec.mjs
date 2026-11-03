@@ -76,13 +76,18 @@ test("reduced motion skips handwriting without blocking the homepage", async ({ 
   await expect(page.locator("#home-title")).toBeVisible();
 });
 
-test("editorial home keeps navigation, large x86 stamp, and no CRT terminal", async ({ page }, testInfo) => {
+test("editorial homepage keeps navigation, topic map and 3D artwork", async ({ page }, testInfo) => {
   test.setTimeout(45000);
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.setViewportSize({ width: 1280, height: 900 });
   await page.goto("/?lang=en", { waitUntil: "domcontentloaded" });
   await expect(page.locator("#loader")).toHaveCount(0, { timeout: 12000 });
-  await expect(page.locator(".hero-stamp")).toContainText("86");
+  await expect(page.locator(".hero-stamp")).toHaveCount(0);
+  await expect(page.locator(".hero-prompt")).toHaveAttribute("aria-label", "_x86");
+  await expect(page.locator("#hero-typed")).toHaveText("x86");
+  await expect(page.locator("#home-explore")).toBeVisible();
+  await expect(page.locator('#home-explore a')).toHaveCount(5);
+  await expect(page.locator(".home-path")).toHaveCount(3);
   await expect(page.locator("#home-title")).toHaveText("Inside x86.");
   await expect(page.locator(".site-nav")).toBeVisible();
   await expect(page.locator(".site-nav a")).toHaveCount(5);
@@ -147,7 +152,9 @@ test("homepage navigation remains usable on narrow phones", async ({ page }, tes
   await page.goto("/", { waitUntil: "domcontentloaded" });
   await expect(page.locator("#loader")).toHaveCount(0, { timeout: 5000 });
   await expect(page.locator("#home-title")).toBeVisible();
-  await expect(page.locator(".hero-stamp")).toBeVisible();
+  await expect(page.locator(".hero-prompt")).toBeVisible();
+  await expect(page.locator("#home-explore")).toBeVisible();
+  await expect(page.locator(".home-path")).toHaveCount(3);
   await expect(page.locator(".site-menu")).toBeVisible();
   await page.screenshot({ path: testInfo.outputPath("layout-home-mobile.png"), fullPage: true });
   await page.locator("#site-menu > summary").click();
@@ -339,4 +346,60 @@ test("3D model failure offers a readable fallback", async ({ page }) => {
   await expect(page.locator(".binary-scene__credit")).toHaveAttribute(
     "href", "https://sketchfab.com/3d-models/retro-computer-3a496376915846459d77fc14fdd6c1e0"
   );
+});
+
+test("Explore reveal follows typing and remains accessible without animation", async ({ page }) => {
+  test.setTimeout(35000);
+  await page.addInitScript(() => {
+    window.__revealTimings = { loaderGone: null, exploreVisible: null };
+    const observer = new MutationObserver(() => {
+      const times = window.__revealTimings;
+      const loader = document.getElementById("loader");
+      const explore = document.getElementById("home-explore");
+      if (times.loaderGone === null && !loader) times.loaderGone = performance.now();
+      if (times.exploreVisible === null && explore?.classList.contains("is-visible")) {
+        times.exploreVisible = performance.now();
+      }
+    });
+    observer.observe(document, { subtree: true, childList: true, attributes: true, attributeFilter: ["class"] });
+  });
+  await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.goto("/?lang=en", { waitUntil: "domcontentloaded" });
+  await expect(page.locator("#loader")).toHaveCount(0, { timeout: 12000 });
+  await expect(page.locator("#home-explore")).toBeVisible({ timeout: 6500 });
+  await expect(page.locator("#hero-typed")).toHaveText("x86");
+  const timing = await page.evaluate(() => window.__revealTimings);
+  expect(timing.exploreVisible - timing.loaderGone).toBeGreaterThanOrEqual(2800);
+  expect(timing.exploreVisible - timing.loaderGone).toBeLessThan(4500);
+  await expect(page.locator("#site-menu > summary")).toBeVisible();
+});
+
+test("Explore and topic paths remain available with reduced motion", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/?lang=en", { waitUntil: "domcontentloaded" });
+  await expect(page.locator("#loader")).toHaveCount(0, { timeout: 5000 });
+  await expect(page.locator("#home-explore")).toBeVisible();
+  await expect(page.locator("#hero-typed")).toHaveText("x86");
+  await expect(page.locator(".hero-prompt__cursor")).toHaveCSS("animation-name", "none");
+  const routeMap = {
+    "Meet the 8086": "/public/history/index.html",
+    "Instruction set": "/public/instructions/basic-instructions.html",
+    "Registers": "/public/architecture/registers.html"
+  };
+  for (const [title, url] of Object.entries(routeMap)) {
+    const link = page.locator(".home-path", { hasText: title });
+    await expect(link).toHaveAttribute("href", url.slice(1));
+  }
+  await page.locator(".home-path", { hasText: "Instruction set" }).click();
+  await expect(page).toHaveURL(/\/public\/instructions\/basic-instructions\.html$/);
+});
+
+test("homepage retains topic links when JavaScript is disabled", async ({ browser }) => {
+  const context = await browser.newContext({ javaScriptEnabled: false });
+  const page = await context.newPage();
+  await page.goto("/", { waitUntil: "domcontentloaded" });
+  await expect(page.locator("#home-explore a")).toHaveCount(5);
+  await expect(page.locator("#home-explore")).toBeVisible();
+  await expect(page.locator(".home-path")).toHaveCount(3);
+  await context.close();
 });
