@@ -406,3 +406,33 @@ test("homepage retains topic links when JavaScript is disabled", async ({ browse
   await expect(page.locator(".home-path")).toHaveCount(3);
   await context.close();
 });
+
+test("homepage copy explains x86 with concrete details and consistent navigation", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/?lang=en", { waitUntil: "domcontentloaded" });
+  await expect(page.locator("#loader")).toHaveCount(0, { timeout: 12000 });
+
+  await expect(page.locator(".editorial-hero__eyebrow")).toHaveText("THE ARCHITECTURE BEHIND THE PC");
+  await expect(page.locator(".editorial-hero__description")).toContainText("introduced x86 in 1978");
+  await expect(page.locator(".hero-evolution span")).toHaveText(["16-BIT", "32-BIT", "64-BIT"]);
+  await expect(page.locator(".hero-palette")).toHaveCount(0);
+  await expect(page.locator(".editorial-hero__link")).toContainText("Explore the field guide");
+
+  const cards = page.locator(".home-path");
+  await expect(cards.nth(0)).toContainText("Released in 1978");
+  await expect(cards.nth(1)).toContainText("move data, perform arithmetic, and control execution");
+  await expect(cards.nth(2)).toContainText("from 16 to 64 bits");
+  await expect(page.locator(".home-path__spec")).toHaveText([
+    "1978 / INTEL 8086", "MOV · ADD · JMP", "AX → EAX → RAX"
+  ]);
+
+  const example = page.locator(".home-example");
+  await expect(example.locator("code")).toHaveText("mov ax, 5\nadd ax, 3");
+  await expect(example.locator("samp")).toHaveText("AX = 0008h");
+
+  await expect(page.locator(".home-explore a")).toHaveCount(5);
+  for (const link of await page.locator(".editorial-hero__link, .home-explore a, .home-path").all()) {
+    await expect(link.locator('[aria-hidden="true"]').last()).toHaveText("→");
+  }
+  await expect(page.locator(".binary-scene__credit")).toHaveAttribute("href", /^https:\/\//);
+});
