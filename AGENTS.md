@@ -4,10 +4,11 @@ This repository is a static educational x86 website. **A green Playwright job do
 
 ## Source of truth and project invariants
 
-- The original editorial visual reference is a white canvas with strong cobalt-blue shapes, tight oversized typography, sparse annotation, three small swatches, and a bottom illustration that occupies the width without clutter.
+- The original editorial visual reference uses a white canvas, cobalt-blue shapes, oversized typography, sparse annotation and a bottom illustration. The homepage replaces decorative swatches with a 16/32/64-bit timeline.
 - Translate that layout to x86 terminology. Keep **Inside x86.** as the primary H1, the small typed `_x86` motif, the timed Explore links, topic-card navigation, and the existing header/settings hamburger. Do not silently remove navigation, theme controls, or accessibility semantics.
 - The bottom artwork is a workstation in front of an ocean-like, pixelated **0/1** wave. Distant digits are smaller/fainter; near digits are larger/more saturated. The binary surf must have recognizable crest, foam, depth and negative space, rather than a uniform random text carpet. Digits can change periodically but must not flicker every frame.
 - Do not restore the old CRT terminal or use image generation for the workstation or wave.
+- Homepage copy should name x86-specific facts, registers or instructions rather than generic educational claims. Preserve clear navigation labels and use → for internal links and ↗ for external links.
 - Maintain the themes Default (`light`), High Contrast (`dark`), Navy, and Hacked; preserve persisted theme IDs. High Contrast palette: `#000000`, `#1E1E2F`, `#FF4500`, `#F8F8FF`, `#FFEA00`, `#00CED1`, `#8A2BE2`.
 - Honor both `prefers-reduced-motion` and the saved `x86-reduced-motion` preference. In reduced motion, freeze decorative animation but keep the loader on screen for at least one second.
 

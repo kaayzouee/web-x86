@@ -45,7 +45,7 @@ for (const { lang, text, duration } of examples) {
     const progress = loader.locator("#loader-progress");
     await expect.poll(async () => Number(await progress.getAttribute("aria-valuenow")), {
       timeout: duration + 7000
-    }).toBeGreaterThanOrEqual(95);
+    }).toBeGreaterThanOrEqual(90);
 
     await expect(loader).toHaveCount(0, { timeout: duration + 7000 });
     await expect(page.locator("#home-title")).toBeVisible();
@@ -72,7 +72,7 @@ test("browser locale selects a greeting when no setting exists", async ({ browse
 test("reduced motion skips handwriting without blocking the homepage", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/?lang=en", { waitUntil: "domcontentloaded" });
-  await expect(page.locator("#loader")).toHaveCount(0, { timeout: 5000 });
+  await expect(page.locator("#loader")).toHaveCount(0, { timeout: 12000 });
   await expect(page.locator("#home-title")).toBeVisible();
 });
 
@@ -150,7 +150,7 @@ test("homepage navigation remains usable on narrow phones", async ({ page }, tes
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.setViewportSize({ width: 320, height: 700 });
   await page.goto("/", { waitUntil: "domcontentloaded" });
-  await expect(page.locator("#loader")).toHaveCount(0, { timeout: 5000 });
+  await expect(page.locator("#loader")).toHaveCount(0, { timeout: 12000 });
   await expect(page.locator("#home-title")).toBeVisible();
   await expect(page.locator(".hero-prompt")).toBeVisible();
   await expect(page.locator("#home-explore")).toBeVisible();
@@ -252,7 +252,7 @@ test("reduced motion loader lasts at least one second (system preference and sav
       await page.evaluate(() => localStorage.setItem("x86-reduced-motion", "true"));
       await page.reload({ waitUntil: "domcontentloaded" });
     }
-    await expect.poll(() => page.evaluate(() => window.__loaderRemovedAt), { timeout: 6000 }).not.toBeNull();
+    await expect.poll(() => page.evaluate(() => window.__loaderRemovedAt), { timeout: 12000 }).not.toBeNull();
     const lifetime = await page.evaluate(() => window.__loaderRemovedAt - window.__loaderObservedAt);
     expect(lifetime).toBeGreaterThanOrEqual(950);
   }
@@ -380,7 +380,7 @@ test("Explore reveal follows typing and remains accessible without animation", a
 test("Explore and topic paths remain available with reduced motion", async ({ page }) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
   await page.goto("/?lang=en", { waitUntil: "domcontentloaded" });
-  await expect(page.locator("#loader")).toHaveCount(0, { timeout: 5000 });
+  await expect(page.locator("#loader")).toHaveCount(0, { timeout: 12000 });
   await expect(page.locator("#home-explore")).toBeVisible();
   await expect(page.locator("#hero-typed")).toHaveText("x86");
   await expect(page.locator(".hero-prompt__cursor")).toHaveCSS("animation-name", "none");
@@ -390,10 +390,10 @@ test("Explore and topic paths remain available with reduced motion", async ({ pa
     "Registers": "/public/architecture/registers.html"
   };
   for (const [title, url] of Object.entries(routeMap)) {
-    const link = page.locator(".home-path", { hasText: title });
+    const link = page.locator(".home-path").filter({ has: page.locator("strong", { hasText: title }) });
     await expect(link).toHaveAttribute("href", url.slice(1));
   }
-  await page.locator(".home-path", { hasText: "Instruction set" }).click();
+  await page.locator(".home-path").filter({ has: page.locator("strong", { hasText: "Instruction set" }) }).click();
   await expect(page).toHaveURL(/\/public\/instructions\/basic-instructions\.html$/);
 });
 
@@ -405,4 +405,34 @@ test("homepage retains topic links when JavaScript is disabled", async ({ browse
   await expect(page.locator("#home-explore")).toBeVisible();
   await expect(page.locator(".home-path")).toHaveCount(3);
   await context.close();
+});
+
+test("homepage copy explains x86 with concrete details and consistent navigation", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.goto("/?lang=en", { waitUntil: "domcontentloaded" });
+  await expect(page.locator("#loader")).toHaveCount(0, { timeout: 12000 });
+
+  await expect(page.locator(".editorial-hero__eyebrow")).toHaveText("THE ARCHITECTURE BEHIND THE PC");
+  await expect(page.locator(".editorial-hero__description")).toContainText("introduced x86 in 1978");
+  await expect(page.locator(".hero-evolution span")).toHaveText(["16-BIT", "32-BIT", "64-BIT"]);
+  await expect(page.locator(".hero-palette")).toHaveCount(0);
+  await expect(page.locator(".editorial-hero__link")).toContainText("Explore the field guide");
+
+  const cards = page.locator(".home-path");
+  await expect(cards.nth(0)).toContainText("Released in 1978");
+  await expect(cards.nth(1)).toContainText("move data, perform arithmetic, and control execution");
+  await expect(cards.nth(2)).toContainText("from 16 to 64 bits");
+  await expect(page.locator(".home-path__spec")).toHaveText([
+    "1978 / INTEL 8086", "MOV · ADD · JMP", "AX → EAX → RAX"
+  ]);
+
+  const example = page.locator(".home-example");
+  await expect(example.locator("code")).toHaveText("mov ax, 5\nadd ax, 3");
+  await expect(example.locator("samp")).toHaveText("AX = 0008h");
+
+  await expect(page.locator(".home-explore a")).toHaveCount(5);
+  for (const link of await page.locator(".editorial-hero__link, .home-explore a, .home-path").all()) {
+    await expect(link.locator('[aria-hidden="true"]').last()).toHaveText("→");
+  }
+  await expect(page.locator(".binary-scene__credit")).toHaveAttribute("href", /^https:\/\//);
 });

@@ -55,3 +55,13 @@ The captured visual audit reported **zero** browser page errors, console errors,
 - The browser audit reported no page errors, console errors, network failures or HTTP errors on the inspected run.
 - A model-viewer full-page capture can omit its WebGL scene when offscreen; screenshots now scroll the 3D model into view before capture.
 - Regression coverage includes the delayed Explore appearance, reduced motion, no-JavaScript availability, and destination URLs.
+
+## X86-specific homepage copy — 2026-11-03
+
+- Replaced the generic hero sentence with Intel 8086's 1978 introduction; kept the `Inside x86.` H1, existing CTA label and `The binary tide`.
+- Updated the three route descriptions to identify the 8086's 16-bit ISA, MOV/ADD/JMP operations, and AX/EAX/RAX register evolution.
+- Replaced the ornamental three-color swatches with a 16/32/64-bit timeline and added distinct technical labels to the topic cards.
+- Added exactly one demonstrative 16-bit instruction sequence (`mov ax, 5`; `add ax, 3`) with the resulting `AX = 0008h`.
+- Internal navigation now uses →; the external model credit uses ↗. The original header menu, theme controls, loading sequence, 3D model and canvas wave were not changed.
+- Reviewed Playwright captures at 320×700, 736×920, 1280×900 and 1280×900 High Contrast. The 736px label wrapping and small-phone bit-width labels were subsequently tightened.
+- Updated automated tests to check technical text, exact link destinations and arrow semantics. Tests were also corrected to distinguish a card's heading from its description when both contain "instruction set".
